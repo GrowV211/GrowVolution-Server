@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Suchen{% endblock %}
+{% block style %}
+    <link href="{{ url_for('static', filename='css/search.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/relation.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="d-flex flex-column search-container bg-white rounded shadow-sm">
+      <div class="m-2">
+          <input id="search" type="search" class="form-control" placeholder="Suchen..." autocomplete="off">
+      </div>
+      <div class="d-flex headline">
+          <div id="users" class="d-flex headline-row selected align-items-center justify-content-center">
+              <b>Benutzer</b>
+          </div>
+          <div id="teams" class="d-flex headline-row align-items-center justify-content-center" style="border-left: 1px solid black; border-right: 1px solid black">
+              <b>Teams</b>
+          </div>
+          <div id="..." class="d-flex headline-row align-items-center justify-content-center">
+              <b>???</b>
+          </div>
+      </div>
+      <div id="container" class="d-flex flex-column">
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

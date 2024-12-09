@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="DE-de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <!-- Font Awesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+        <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+
+        {% block style %}{% endblock %}
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+        <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+
+        {% block script %}{% endblock %}
+
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+        <title>{% block title %}ChangeMe{% endblock %}</title>
+    </head>
+    <body class="base-body">
+
+        <div class="d-flex flex-column min-vh-100">
+
+            <header>
+                {% include "nav.html" %}
+                {% include "flashing.html" %}
+            </header>
+
+            <main class="flex-fill">
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="bg-dark text-white pt-4">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-3 mb-3">
+                            <h5>Über uns</h5>
+                            <p>
+                                Wir wollen sehen, wie sich die Welt durch dein persönliches Wachstum verändert.
+                            </p>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <h5>Links</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="/impressum" class="text-white">Impressum</a></li>
+                                <li><a href="/privacy" class="text-white">Datenschutz</a></li>
+                                <li><a href="/guidelines" class="text-white">Richtlinien</a></li>
+                                <li><a href="/about" class="text-white">Das ist GrowVolution</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h5>Kontakt</h5>
+                            <address>
+                                <a href="tel:+491745881313" class="text-white">+49 174 5881313</a><br>
+                                <a href="mailto:info@growvolution.org" class="text-white">info@growvolution.org</a>
+                            </address>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="mb-0">&copy; 2024 GrowVolution. Inhalt klassifiziert als CC0.</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    </body>
+</html>

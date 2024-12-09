@@ -1,0 +1,56 @@
+.mod-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    max-height: 80%;
+}
+
+
+.headline-row {
+    display: flex;
+    border-bottom: 1px solid grey;
+}
+
+.headline-col {
+    display: flex;
+    font-weight: bold;
+    padding: 5px;
+    width: 33.3%;
+    align-items: center;
+    justify-content: center;
+}
+
+.middle {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+}
+
+.headline-col:hover:not(.selected) {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.selected {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.list-element {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 15px;
+}
+
+.mod-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.mod-buttons button {
+    width: 50%;
+    margin-left: 5px;
+    margin-right: 5px;
+}

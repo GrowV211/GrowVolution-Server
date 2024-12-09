@@ -1,0 +1,88 @@
+<style>
+    .chat-user {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 22px !important;
+    }
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: 500px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    .date {
+        background: rgba(143, 188, 143, 0.7);
+        padding: 4px;
+    }
+    .message {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        min-width: 150px;
+        max-width: 70%;
+        overflow-wrap: break-word;
+    }
+    .received {
+        background: lightgray;
+        align-self: flex-start;
+    }
+    .sent {
+        background: lightgreen;
+        align-self: flex-end;
+    }
+    .message-head {
+        font-size: 12px;
+        font-weight: bold;
+        padding: 3px 0 3px 10px;
+        border-bottom: 1px solid gray;
+    }
+    .message-content {
+        padding: 5px 8px 5px 10px;
+    }
+</style>
+<div class="d-flex flex-column">
+    <div class="d-flex border-bottom p-2">
+        <a>
+            {% include "basic/account/profile_image.html" %}
+        </a>
+        <b class="font-20 align-self-center ml-3 w-100">{{ name }}</b>
+        <div class="container" id="nav-container">
+            <i id="back" class="bi bi-arrow-left float-end"></i>
+        </div>
+    </div>
+    <div id="chat-container" class="chat-container">
+        {{ chat }}
+    </div>
+    <div class="d-flex align-items-center border-top p-2">
+        <textarea id="chat-message" class="form-control" placeholder="Schreibe eine Nachricht..." rows="2"></textarea>
+        <span id="send" class="send text-center"><i class="send-icon fas fa-paper-plane"></i></span>
+    </div>
+</div>
+<script>
+    const chat = document.getElementById("chat-container")
+    const message = document.getElementById("chat-message")
+
+    document.getElementById("send").addEventListener("click", () => {
+        const content = message.value
+
+        if (!content) {
+            alert("Du kannst keine leeren Nachrichten versenden.")
+            return
+        }
+
+        SOCKET.emit("chat_message", {
+            username: '{{ username }}',
+            content: content
+        })
+    })
+
+    SOCKET.on("update_chat", (data) => {
+        chat.innerHTML = data.chat
+    })
+
+    document.getElementById("back").addEventListener("click", () => {
+        SOCKET.emit("close_chatroom", '{{ destination }}')
+    })
+</script>

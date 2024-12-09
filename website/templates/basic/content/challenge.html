@@ -1,0 +1,15 @@
+<div id="{{ id }}" class="challenge rounded shadow">
+    <div class="content-headline-container">
+        <span class="category">{{ category }}</span>
+        <b class="content-headline w-100">{{ headline }}</b>
+    </div>
+    <div class="content-body p-2">
+        {{ content }}
+    </div>
+    <div class="d-flex {% if active and not post_user %} challenge-bottom-divider {% endif %}">
+        <span class="timestamp">{{ timestamp }}</span>
+    </div>
+    {% if active and not post_user %}
+        <button id="accept {{ id }}" type="button" class="btn btn-success challenge-btn m-2">Aufgabe annehmen</button>
+    {% endif %}
+</div>

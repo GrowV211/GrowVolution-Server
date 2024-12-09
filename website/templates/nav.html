@@ -1,0 +1,46 @@
+{% block style %}<link href="{{ url_for('static', filename='css/nav.css') }}" rel="stylesheet">{% endblock %}
+<nav class="navbar navbar-expand-lg bg-dark navbar-custom border-bottom border-body" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="GrowV" width="35" height="35"><span id="day-timer" class="timer"></span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link {% if request.path == '/challenges' %}active{% endif %}" href="/challenges">Aufgaben</a>
+                <a class="nav-link {% if request.path == '/discussions' %}active{% endif %}" href="/discussions">Diskussionen</a>
+                <a class="nav-link {% if request.path == '/ranking' %}active{% endif %}" href="/ranking">Bestenlisten</a>
+                <a class="nav-link {% if request.path == '/shop' %}active{% endif %}" href="/shop">Angebote</a>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Konto
+                    </a>
+                    <div class="dropdown-menu">
+                        {% if user_nav %}
+                            <a class="dropdown-item {% if request.path == '/user' %}active{% endif %}" href="/user">Mein Profil</a>
+                            <a class="dropdown-item {% if request.path == '/accepted' %}active{% endif %}" href="/accepted">Angenommene Aufgaben</a>
+                            <a class="dropdown-item {% if request.path == '/progress' %}active{% endif %}" href="/progress">Fortschritt</a>
+                            <a class="dropdown-item d-flex align-items-center {% if request.path == '/journal' %}active{% endif %}" href="/journal">Journal<span id="journal" class="unread ms-auto" style="display: {{ 'iniline-block' if journal_time else 'none' }}"></span></a>
+                            <a class="dropdown-item d-flex align-items-center {% if request.path == '/conversations' %}active{% endif %}" href="/conversations">Unterhaltungen<span id="messages" class="unread ms-auto" style="display: {{ 'iniline-block' if unread_messages else 'none' }}">{{ unread_messages }}</span></a>
+                            <a class="dropdown-item d-flex align-items-center {% if request.path == '/relations' %}active{% endif %}" href="/relations">Beziehungen<span id="requests" class="unread ms-auto" style="display: {{ 'iniline-block' if unread_requests else 'none' }}">{{ unread_requests }}</span></a>
+                            <a class="dropdown-item {% if request.path == '/teams' %}active{% endif %}" href="/teams">Teams</a>
+                            {% if role == "ADMIN" or role == "MOD" %}
+                                <hr class="dropdown-divider">
+                                <a class="dropdown-item d-flex align-items-center {% if request.path == '/mod-panel' %}active{% endif %}" href="/mod-panel">Moderation<span id="mod_msgs" class="unread ms-auto" style="display: {{ 'iniline-block' if mod_messages else 'none' }}"></span></a>
+                                {% if role == "ADMIN" %}
+                                    <a class="dropdown-item d-flex align-items-center {% if request.path == '/admin-panel' %}active{% endif %}" href="/admin-panel">Administration<span id="admin_msgs" class="unread ms-auto" style="display: {{ 'iniline-block' if admin_messages else 'none' }}"></span></a>
+                                {% endif %}
+                            {% endif %}
+                            <hr class="dropdown-divider">
+                            <a class="dropdown-item" href="/logout">Ausloggen</a>
+                        {% else %}
+                            <a class="dropdown-item {% if request.path == '/login' %}active{% endif %}" href="/login">Einloggen</a>
+                            <a class="dropdown-item {% if request.path == '/signup' %}active{% endif %}" href="/signup">Registrieren</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <a class="nav-link {% if request.path == '/search' %}active{% endif %}" href="/search">Suchen</a>
+            </div>
+        </div>
+    </div>
+</nav>

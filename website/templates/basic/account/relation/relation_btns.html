@@ -1,0 +1,12 @@
+{% if relation.active %}
+    <span id="remove" class="relation-btn remove-btn"></span>
+{% elif relation.requested %}
+    {% if relation.requestor %}
+        <span id="cancel" class="relation-btn cancel-btn"></span>
+    {% else %}
+        <span id="accept" class="relation-btn accept-btn">✔</span>
+        <span id="deny" class="relation-btn deny-btn">x</span>
+    {% endif %}
+{% elif relation.profile_view %}
+    <span id="add" class="relation-btn add-btn">+</span>
+{% endif %}

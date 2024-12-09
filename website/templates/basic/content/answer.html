@@ -1,0 +1,27 @@
+<div id="{{ id }}" class="answer">
+    <a>
+        {% include "basic/account/profile_image.html" %}
+    </a>
+    <div class="comment-inner rounded shadow-sm">
+        <div class="d-flex">
+            <b class="username">{{ username }}</b>
+            <div class="container">
+                <div class="float-end">
+                    {% if comment_user %}
+                        <i id="edit" class="bi bi-pencil comment-icon"></i>
+                        <i id="delete" class="bi bi-trash comment-icon"></i>
+                    {% elif active %}
+                        <i id="{{ 'unlike' if liked else 'like' }}" class="bi {{ 'bi-heart-fill' if liked else 'bi-heart' }} comment-icon"></i>
+                        <i id="reply" class="bi bi-reply comment-icon"></i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="content-body p-2">
+            {{ content }}
+        </div>
+        <div class="d-flex">
+            <span class="timestamp">{{ timestamp }}</span>
+        </div>
+    </div>
+</div>

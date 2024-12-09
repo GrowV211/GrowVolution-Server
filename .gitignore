@@ -1,0 +1,4 @@
+*.env
+/website/static/img/
+/website/static/proof/
+/website/logs/

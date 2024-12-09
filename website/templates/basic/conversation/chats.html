@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Unterhaltungen{% endblock %}
+{% block style %}
+  <link href="{{ url_for('static', filename='css/chats.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/conversation/chats.js') }}"></script>
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div id="chats-container" class="d-flex flex-column chats-container bg-white rounded shadow-sm">
+      {{ chats }}
+    </div>
+  </div>
+{% endblock %}

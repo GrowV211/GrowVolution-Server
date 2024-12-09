@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Journal{% endblock %}
+{% block style %}
+  <link href="{{ url_for('static', filename='css/profile.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/content/journal.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="journal">
+            <div id="entries">
+                {{ journal_entries }}
+            </div>
+            {% if journal_time %}
+                <div id="journal_form" class="journal-entry bg-white rounded shadow">
+                    <form id="journal" method="post">
+                        {{ questions }}
+                        <button type="submit" class="btn btn-success w-100">Speichern</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

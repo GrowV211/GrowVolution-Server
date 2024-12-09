@@ -1,0 +1,24 @@
+<p class="mb-4 text-center">
+    Alles klar, wir haben dein Passwort geändert.
+</p>
+<div class="d-flex justify-content-center">
+    <button type="button" id="login" class="btn btn-primary w-50" aria-describedby="hint">Anmelden</button>
+</div>
+<div class="d-flex justify-content-center"><span class="form-text" id="hint">Automatische Weiterleitung in <span id="timer">6</span> Sekunden.</span></div>
+<script>
+    const timer = document.getElementById("timer")
+    let time = parseInt(timer.textContent)
+
+    const interval = setInterval(function () {
+        time--
+        timer.textContent = time.toString()
+        if (time <= 0) {
+            clearInterval(interval)
+            window.location = "{{ homepage }}login"
+        }
+    }, 1000)
+
+    document.getElementById("home").addEventListener("click", () => {
+        window.location = "{{ homepage }}login"
+    })
+</script>

@@ -1,0 +1,23 @@
+{% extends "auth/base.html" %}
+{% block title %}Identität bestätigen{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/auth/resend_timer.js') }}"></script>
+{% endblock %}
+{% block form_content %}
+    <p class="mb-4 text-center">
+        Hey {{ user }}, wir haben deine Anfrage erhalten und danken dir
+        ganz herzlich für dein Vertrauen. Bevor wir dich jedoch in unserer
+        Community begrüßen können, würden wir dich bitten kurz deine E-Mail
+        Adresse ({{ email }}) zu bestätigen. Hierzu haben wir dir einen Link
+        geschickt, über den du sie ganz bequem verifizieren kannst. Der Link
+        ist 10 Minuten gültig. Wir sehen uns dann auf der anderen Seite,
+        bis gleich! :D
+        <br><br>
+        Falls du keine E-Mail erhalten hast (und auch deinen Spam Ordner bereits
+        überprüft hast), kannst du hier ganz entspannt eine neue anfordern:
+    </p>
+    <div class="d-flex justify-content-center">
+        <button type="button" id="resend" class="btn btn-primary w-50" aria-describedby="hint">Erneut senden</button>
+    </div>
+    <div class="d-flex justify-content-center"><span class="form-text" id="hint"><span id="time">{{ time }}</span></span></div>
+{% endblock %}

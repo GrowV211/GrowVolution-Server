@@ -1,0 +1,17 @@
+<div class="d-flex flex-column">
+    <div class="container" id="nav-container">
+        <i id="back" class="bi bi-arrow-left float-end"></i>
+    </div>
+</div>
+<script>
+  document.getElementById("back").addEventListener("click", () => {
+        fetch(window.location, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({value: 'profile'})
+        }).then(res => res.text()).then(html => {
+            comments.innerHTML = html
+            init()
+        })
+    })
+</script>

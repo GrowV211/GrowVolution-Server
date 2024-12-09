@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Beziehungen{% endblock %}
+{% block style %}
+    <link href="{{ url_for('static', filename='css/relation.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/account/relations.js') }}"></script>
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="d-flex flex-column relation-container bg-white rounded shadow-sm">
+        <div class="d-flex headline">
+            <div id="active" class="d-flex headline-row selected align-items-center justify-content-center">
+                <b>Aktiv</b>
+            </div>
+            <div id="requested" class="d-flex headline-row align-items-center justify-content-center" style="border-left: 1px solid black; border-right: 1px solid black">
+                <b id="requests_text" style="margin-left: {{ '20px' if unread_requests else 0 }}">Anfragen</b><span id="requests" class="unread ms-auto" style="display: {{ 'iniline-block' if unread_requests else 'none' }}">{{ unread_requests }}</span>
+            </div>
+            <div id="pending" class="d-flex headline-row align-items-center justify-content-center">
+                <b>Ausstehend</b>
+            </div>
+        </div>
+        <div id="container" class="d-flex flex-column" style="overflow-y: auto">
+            {{ relations }}
+        </div>
+    </div>
+  </div>
+{% endblock %}

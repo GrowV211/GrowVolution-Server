@@ -1,0 +1,122 @@
+.relation-btn {
+    color: black;
+    border: 1px solid black;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 20px;
+    width: 23px;
+    height: 23px;
+    display: inline-block;
+    text-align: center;
+    padding: 0;
+    margin-right: 2px;
+    vertical-align: middle;
+}
+
+.add-btn {
+    line-height: 21px;
+}
+
+.add-btn:hover {
+    width: 21px;
+    height: 21px;
+    font-size: 19px;
+    line-height: 19px;
+}
+
+.cancel-btn {
+    position: relative;
+    font-size: 19px;
+    line-height: 21px;
+}
+
+.cancel-btn::before {
+    content: '?';
+}
+
+.cancel-btn:hover {
+    line-height: 18px;
+    background: rgba(255, 0, 0, 0.7);
+    color: #efefef;
+}
+
+.cancel-btn:hover::before {
+    content: 'x';
+}
+
+.accept-btn {
+    font-size: 15px;
+    line-height: 21px;
+}
+
+.accept-btn:hover {
+    background: rgba(0, 128, 0, 0.7);
+    color: #efefef;
+}
+
+.deny-btn {
+    line-height: 18px;
+}
+
+.deny-btn:hover {
+    background: rgba(255, 0, 0, 0.7);
+    color: #efefef;
+}
+
+.remove-btn {
+    position: relative;
+    font-size: 18px;
+    line-height: 19px;
+}
+
+.remove-btn::before {
+    content: '∞';
+}
+
+.remove-btn:hover {
+    font-size: 19px;
+    line-height: 18px;
+    background: rgba(255, 0, 0, 0.7);
+    color: #efefef;
+}
+
+.remove-btn:hover::before {
+    content: 'x';
+}
+
+.relation-container {
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+    min-height: 200px;
+    max-height: 600px;
+}
+
+.profile-picture {
+    width: 35px !important;
+    height: 35px !important;
+    font-size: 16px !important;
+}
+
+.list-element:hover {
+    background: rgba(211, 211, 211, 0.3);
+}
+
+.headline {
+    height: 35px;
+    border-bottom: 1px solid black;
+}
+
+.headline-row {
+    width: 33.3%;
+}
+
+.headline-row:hover:not(.selected) {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.selected {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.6);
+}

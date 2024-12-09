@@ -1,0 +1,25 @@
+.auth-container {
+  max-width: 500px;
+  width: 100%;
+}
+
+.logo {
+  height: 50px;
+}
+
+.headline {
+  border-bottom: 1px solid grey;
+}
+
+input {
+  width: 100%;
+}
+
+.psw-help {
+  color: lightskyblue;
+}
+
+.psw-help:hover {
+  color: mediumpurple;
+  text-decoration: underline;
+}

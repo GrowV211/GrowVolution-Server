@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Angenommen{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/account/accepted.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="challenge-container rounded">
+            {{ challenges }}
+        </div>
+    </div>
+    <div class="modal fade" id="uploadEvidenceModal" tabindex="-1" aria-labelledby="uploadEvidenceModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="uploadEvidenceModalLabel">Beweis hochladen</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Abbrechen"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Um die Aufgabe erfolgreich abzuschließen, kannst du bis zu 5 Dateien als Beweis hochladen.<br><br>
+              <strong>Hinweis:</strong> Dein Score kann nur mit einem Beweis aktualisiert werden.
+            </p>
+            <p class="text-danger">
+              Das Absenden dieses Formulars (mit oder ohne Beweis) kann nicht rückgängig gemacht werden und die Aufgabe gilt als erledigt.
+            </p>
+
+            <form id="evidenceForm">
+              <div class="mb-3">
+                <label for="evidenceFiles" class="form-label">Dateien hochladen (max. 5 Dateien):</label>
+                <input class="form-control" type="file" id="evidenceFiles" name="files" multiple accept="image/*,application/pdf" />
+                <div class="form-text">Erlaubte Formate: Bilder und PDFs</div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" id="submitWithoutEvidence">Ohne Beweis fortfahren</button>
+            <button type="button" class="btn btn-primary" id="submitEvidence">Beweis hochladen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

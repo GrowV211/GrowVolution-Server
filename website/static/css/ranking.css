@@ -1,0 +1,79 @@
+.ranking-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.headline-row {
+    display: flex;
+    border-bottom: 1px solid grey;
+}
+
+.headline-col {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: bold;
+    width: 50%;
+}
+
+.headline-col:hover {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.selected {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.list-row {
+    display: flex;
+    width: 100%;
+    padding: 5px 15px;
+    align-items: center;
+}
+
+.first {
+    font-size: 25px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.second {
+    font-size: 25px;
+    font-weight: bold;
+    color:  #C0C0C0;
+}
+
+.third {
+    font-size: 25px;
+    font-weight: bold;
+    color: #CD7F32;
+}
+
+.place {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.profile-picture {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+}
+
+.user-data {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.score {
+    margin-left: auto;
+    font-weight: bold;
+}

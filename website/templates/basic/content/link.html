@@ -1,0 +1,10 @@
+<div class="link mb-2">
+    <i class="bi bi-link-45deg link-icon"></i>
+    <a class="link-text" href="{{ link }}" target="_blank">{{ titel }}</a>
+    {% if link_user %}
+        <div class="link-tools">
+            <i id="edit" class="bi bi-pencil link-btn"></i>
+            <i id="delete" class="bi bi-trash link-btn"></i>
+        </div>
+    {% endif %}
+</div>

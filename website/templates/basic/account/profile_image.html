@@ -1,0 +1,7 @@
+<div class="user {{ type }}" style="background-color: {{ user.bg_color if user.img_src is none else 'transparent' }};">
+    {% if user.img_src %}
+        <img src="{{ user.img_src }}" alt="{{ user.name }}">
+    {% else %}
+        <span class="profile-initials">{{ user.initials }}</span>
+    {% endif %}
+</div>

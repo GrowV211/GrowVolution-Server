@@ -1,0 +1,46 @@
+<div class="d-flex">
+    <i id="back" class="bi bi-arrow-left ms-auto"></i>
+</div>
+<p class="text-center mt-2 mb-2">
+    Hey, wenn du dein Passwort vergessen hast, ist das kein Problem.
+    Gib einfach deine E-Mail Adresse unten ein und wir schicken dir
+    einen Link zum Zurücksetzen deines Passworts. ;)
+</p>
+<div class="mb-3">
+    <label for="email" class="form-label">E-Mail Adresse</label>
+    <input type="text" id="email" class="form-control" placeholder="max@muster.de" required>
+</div>
+<div class="d-flex justify-content-center">
+    <button id="request" type="button" class="btn btn-primary">Link anfordern</button>
+</div>
+<script>
+    const email = document.getElementById("email")
+
+    async function checkAvailable(value) {
+
+        const res = await fetch('/availability-check', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'email', value: value})
+        })
+
+        const data = await res.json()
+
+        return !!data['available']
+    }
+
+    document.getElementById("request").addEventListener("click", () => {
+        const value = email.value
+
+        checkAvailable(value).then(available => {
+            if (available)
+                updateForm('reset-link', value)
+            else
+                alert("Für diese E-Mail Adresse existiert kein Account.")
+        })
+    })
+
+    document.getElementById("back").addEventListener("click", () => {
+        updateForm('login')
+    })
+</script>

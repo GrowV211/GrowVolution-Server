@@ -1,0 +1,42 @@
+.navbar-custom .nav-link {
+    color: rgb(175, 175, 175);
+}
+
+.navbar-custom .nav-link:hover {
+    color: darkseagreen;
+}
+
+.navbar-custom .nav-link.active {
+    color: rgb(210, 210, 210);
+}
+
+.navbar-custom .dropdown-item:hover {
+    color: darkseagreen;
+    border-radius: 5px;
+}
+
+.navbar-custom .dropdown-item.active {
+    color: lightseagreen;
+    background: inherit;
+}
+
+.navbar-custom .dropdown-toggle[aria-expanded="true"] {
+    color: white;
+}
+
+.timer {
+    font-size: 15px;
+    margin-left: 10px;
+}
+
+.navbar-custom input {
+    border: 1px solid #808080 !important;
+    border-radius: 5px !important;
+    outline: none !important;
+    margin-left: 10px;
+}
+
+.navbar-custom input:focus {
+    border: 2px solid #808080 !important;
+    box-shadow: 0 0 5px #808080 !important;
+}

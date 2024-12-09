@@ -1,0 +1,18 @@
+<div id="{{ id }}" class="challenge supress-hover {{ 'provable' if provable }} rounded shadow">
+    <div class="content-headline-container">
+        <span class="category">{{ category }}</span>
+        <b class="content-headline w-100">{{ headline }}</b>
+    </div>
+    <div class="content-body p-2">
+        {{ content }}
+    </div>
+    <div class="d-flex challenge-bottom-divider">
+        <span class="timestamp">{{ timestamp }}</span>
+    </div>
+    {% if not done %}
+        <button id="finish" type="button" class="btn btn-primary challenge-btn m-2">Als erledigt markieren</button>
+    {% else %}
+        <button type="button" class="btn btn-secondary challenge-btn m-2" disabled>Erledigt</button>
+    {% endif %}
+    <button id="cancel" type="button" class="btn btn-danger challenge-btn m-2" {% if done %} disabled {% endif %}>Nicht mehr teilnehmen</button>
+</div>

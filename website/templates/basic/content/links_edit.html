@@ -1,0 +1,143 @@
+<div class="d-flex flex-column justify-content-center m-3">
+    <div class="container">
+        <i id="back" class="bi bi-arrow-left float-end"></i>
+    </div>
+
+    <div id="social-icons" class="d-flex justify-content-center mb-3">
+        {{ socials }}
+    </div>
+
+    <div class="link-container">
+        {{ links }}
+    </div>
+
+    <form id="new" style="display: none">
+        <div class="link">
+            <div class="d-flex flex-column w-100">
+                <input id="link" type="text" class="form-control mb-2" name="link" placeholder="https://musterdomain.de/deine-seite/" required>
+                <input id="titel" type="text" class="form-control mb-2" name="titel" placeholder="Titel des Links..." required>
+                <select id="type" name="type" class="form-select">
+                    <option selected value="standard">Standard Link</option>
+                    <option value="social">Social Link</option>
+                </select>
+                <select id="social" class="form-select mt-2" name="social" style="display: none">
+                    <option selected value="fa-youtube">YouTube</option>
+                    <option value="fa-instagram">Instagram</option>
+                    <option value="fa-twitter">Twitter</option>
+                    <option value="fa-facebook">Facebook</option>
+                    <option value="fa-linkedin">LinkedIn</option>
+                </select>
+                <div class="d-flex mt-2">
+                    <button type="submit" class="btn btn-success w-50 m-1">Speichern</button>
+                    <button id="cancel" type="button" class="btn btn-secondary w-50 m-1">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="d-flex">
+        <button id="add" type="button" class="btn btn-primary-outline w-100">Neuer Link</button>
+    </div>
+</div>
+<script>
+    const socials = document.getElementById("social-icons")
+    const links = document.querySelector(".link-container")
+    const newLink = document.getElementById("new")
+
+    const link = document.getElementById("link")
+    const titel = document.getElementById("titel")
+    const type = document.getElementById("type")
+    const social = document.getElementById("social")
+    const cancel = document.getElementById("cancel")
+
+    function clear() {
+        link.value = ""
+        titel.value = ""
+    }
+
+    function hide() {
+        newLink.style.display = "none"
+        clear()
+    }
+
+    function initButtons() {
+        links.querySelectorAll(".link").forEach(link => {
+            link.querySelectorAll(".bi").forEach(btn => {
+                if (btn.id) {
+                    btn.addEventListener("click", () => {
+                        if (btn.id === "edit") {
+
+                        }
+                    })
+                }
+            })
+        })
+    }
+
+    document.getElementById("add").addEventListener("click", () => {
+        newLink.style.display = "block"
+    })
+
+    function initSocials() {
+        socials.querySelectorAll(".social-icon").forEach(icon => {
+            icon.addEventListener("click", () => {
+                icon.querySelector("#link").click()
+            })
+        })
+    }
+
+    type.addEventListener("change", (event) => {
+        if (event.target.value === "standard") {
+            titel.value = ""
+            titel.style.display = "block"
+            social.style.display = "none"
+        }
+        else {
+            titel.value = "---"
+            titel.style.display = "none"
+            social.style.display = "block"
+        }
+    })
+
+    newLink.addEventListener("submit", (event) => {
+        event.preventDefault()
+
+        const form = event.target
+
+        if (!form.checkValidity()) {
+            form.reportValidity()
+            return
+        }
+
+        event.target.reset()
+
+        const formData = new FormData(form)
+
+        fetch("/link/add", {
+            method: "POST",
+            body: formData
+        }).then(res =>  res.json()).then(data => {
+            socials.innerHTML = data['socials'].toString()
+            links.innerHTML = data['links'].toString()
+
+            hide()
+
+            initSocials()
+        })
+    })
+
+    cancel.addEventListener("click", hide)
+
+    document.getElementById("back").addEventListener("click", () => {
+        fetch(window.location, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({value: 'profile'})
+        }).then(res => res.text()).then(html => {
+            container.innerHTML = html
+            init()
+        })
+    })
+
+    initSocials()
+</script>

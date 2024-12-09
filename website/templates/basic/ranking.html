@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Bestenlisten{% endblock %}
+{% block style %}
+    <link href="{{ url_for('static', filename='css/ranking.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/ranking.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="ranking-container bg-white rounded shadow">
+            <div class="headline-row">
+                <span id="users" class="headline-col selected">Nutzer</span>
+                <span id="teams" class="headline-col" style="border-left: 1px solid grey">Teams</span>
+            </div>
+            {{ ranking_list }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ username }}{% endblock %}
+{% block style %}
+    <link href="{{ url_for('static', filename='css/profile.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/relation.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/account/profile.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div id="content" class="content-container bg-white rounded shadow-sm">
+            {% include "basic/account/profile_inner.html" %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="profile-link" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="copyModalLabel">Profil teilen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="linkText">{{ homepage }}user/{{ username }}</p>
+                    <p id="copied" class="text-success" style="display: none"><i class="bi bi-check"></i>Link kopiert!</p>
+                    <button id="copyButton" class="btn btn-secondary mt-2">Link kopieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

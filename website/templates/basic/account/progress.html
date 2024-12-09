@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Fortschritt{% endblock %}
+{% block style %}
+  <link href="{{ url_for('static', filename='css/profile.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="progress bg-white rounded shadow p-3">
+            <div class="mb-4">
+                <h3>Mein persönliches Ziel</h3>
+                <p>{{ goal }}</p>
+            </div>
+
+            <div class="mb-4">
+                <h4>Aktueller Stand</h4>
+                <div class="mb-2">
+                    <h5>Körperlich</h5>
+                    <p>{{ body_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Mental</h5>
+                    <p>{{ mental_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Beziehungen</h5>
+                    <p>{{ relations_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Persönlich</h5>
+                    <p>{{ personal_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Finanziell</h5>
+                    <p>{{ financial_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Beruflich</h5>
+                    <p>{{ career_current }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Spirituell</h5>
+                    <p>{{ spiritual_current }}</p>
+                </div>
+            </div>
+
+            <div>
+                <h4>Da möchte ich hin</h4>
+                <div class="mb-2">
+                    <h5>Körperlich</h5>
+                    <p>{{ body_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Mental</h5>
+                    <p>{{ mental_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Beziehungen</h5>
+                    <p>{{ relations_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Persönlich</h5>
+                    <p>{{ personal_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Finanziell</h5>
+                    <p>{{ financial_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Beruflich</h5>
+                    <p>{{ career_future }}</p>
+                </div>
+                <div class="mb-2">
+                    <h5>Spirituell</h5>
+                    <p>{{ spiritual_future }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

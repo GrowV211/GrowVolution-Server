@@ -1,0 +1,271 @@
+<div id="{{ id }}" class="post m-3">
+    <div class="container" id="nav">
+        <div class="float-end">
+            {% if post_user %}
+                <i id="edit" class="bi bi-pencil"></i>
+                <i id="delete" class="bi bi-trash pl-2"></i>
+            {% elif active %}
+                <i id="{{ 'unlike' if liked else 'like' }}" class="bi {{ 'bi-heart-fill' if liked else 'bi-heart' }}"></i>
+            {% endif %}
+            <i id="back" class="bi bi-arrow-left pl-2"></i>
+        </div>
+    </div>
+    <h2 id="headline">{{ headline }}</h2>
+    <div class="content-body p-2 mb-2">
+        {{ body }}
+    </div>
+    <div class="d-flex border-bottom">
+        <span class="category-focus">{{ category }}</span>
+        <span class="timestamp">{{ timestamp }}</span>
+    </div>
+    {% if challenge and active and not post_user %}
+        {% if accepted %}
+            <button id="cancel" type="button" class="btn btn-danger challenge-btn m-2">Nicht mehr teilnehmen</button>
+        {% else %}
+            <button id="accept" type="button" class="btn btn-success challenge-btn m-2">Aufgabe annehmen</button>
+        {% endif %}
+    {% endif %}
+    <div class="comment-container rounded p-3">
+        {{ comments }}
+    </div>
+    {% if active %}
+        <label id="commentLabel" for="comment" class="form-label mt-2" style="display: none; align-items: center"></label>
+        <div class="d-flex p-2 align-items-center justify-content-center comment-line">
+            <textarea id="comment" class="form-control" placeholder="Schreibe einen Kommentar..." rows="1"></textarea>
+            <span class="send text-center"><i class="send-icon fas fa-paper-plane"></i></span>
+        </div>
+    {% endif %}
+</div>
+<script>
+    const post = document.getElementById('{{ id }}')
+    const nav = document.getElementById("nav")
+    const headline = document.getElementById("headline")
+    const content = post.querySelector(".content-body")
+    const comments = post.querySelector(".comment-container")
+    const commentView = document.getElementById("comment")
+    const label = document.getElementById("commentLabel")
+    const send = post.querySelector(".send")
+
+    const challengeButton = post.querySelector(".challenge-btn")
+
+    function clearLabel() {
+        label.innerHTML = ''
+        label.style.display = "none"
+    }
+
+    function getTextarea(currentValue, rows='1') {
+        return `<textarea class='form-control' rows='${rows}'>${currentValue}</textarea>`
+    }
+
+    function updateComment(container, commentID, action, value=null) {
+        fetch('/comment/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: commentID, value: action, content: value})
+        }).then(res => res.text()).then(html => {
+            if (container) {
+                container.innerHTML = html
+                initButtons()
+            }
+        })
+    }
+
+    function initButtons() {
+        function updateLogic(container, comment, btn) {
+            btn.addEventListener("click", () => {
+                const id = btn.id
+
+                if (id === "delete")
+                    updateComment(container, comment.id, id)
+                else if (id === "edit") {
+                    btn.className = "bi bi-save comment-icon"
+                    btn.id = "save"
+                    const commentBody = comment.querySelector(".content-body")
+                    const commentText = commentBody.innerText
+                    commentBody.innerHTML = getTextarea(commentText)
+
+                    initButtons()
+                } else if (id === "save") {
+                    btn.className = "bi bi-pencil comment-icon"
+                    btn.id = "edit"
+                    const editView = comment.querySelector(".form-control")
+                    const commentText = editView.value
+                    updateComment(container, comment.id, btn.id, commentText)
+                } else if (btn.id === "like") {
+                    updateComment(null, comment.id, btn.id)
+                    btn.id = "unlike"
+                    btn.classList.remove("bi-heart")
+                    btn.classList.add("bi-heart-fill")
+                } else if (btn.id === "unlike") {
+                    updateComment(null, comment.id, btn.id)
+                    btn.id = "like"
+                    btn.classList.remove("bi-heart-fill")
+                    btn.classList.add("bi-heart")
+                } else {
+                    label.innerHTML = `
+                        <button type="button" class="btn-close" aria-label="Close" style="margin-right: 0.5rem;" onclick="const label = document.getElementById('commentLabel'); label.innerHTML = ''; label.style.display = 'none'"></button>
+                        [Antwort] @${comment.querySelector(".username").textContent}
+                        <span id="commentID" style="display: none">${comment.id}</span>
+                    `
+
+                    label.style.display = "flex"
+                }
+            })
+        }
+
+        comments.querySelectorAll(".comment").forEach(comment => {
+            comment.querySelectorAll(".bi").forEach(btn => {
+                if (!btn.hasEventListner) {
+                    updateLogic(comments, comment, btn)
+                    btn.hasEventListner = true
+                }
+            })
+        })
+
+        comments.querySelectorAll(".answers").forEach(answers => {
+            answers.querySelectorAll(".answer").forEach(answer => {
+                answer.querySelectorAll(".bi").forEach(btn => {
+                    if (!btn.hasEventListner) {
+                        updateLogic(answers, answer, btn)
+                        btn.hasEventListner = true
+                    }
+                })
+            })
+        })
+
+        nav.querySelectorAll(".bi").forEach(btn => {
+            function back() {
+                fetch(window.location, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({value: 'profile'})
+                }).then(res => res.text()).then(html => {
+                    container.innerHTML = html
+                    init()
+                })
+            }
+
+            function updatePost(command, headline=null, content=null) {
+                fetch("/content/update", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: post.id, value: command, headline: headline, content: content})
+                }).then(res => res.text()).then(html => {
+                    if (command === "edit") {
+                        container.innerHTML = html
+
+                        container.querySelectorAll("script").forEach(script => {
+                            eval(script.innerText)
+                        })
+                    } else if (command === "delete") {
+                        back()
+                    }
+                })
+            }
+
+            if (!btn.hasEventListner) {
+                btn.addEventListener("click", () => {
+
+                    if (btn.id === "edit") {
+                        btn.id = "save"
+                        btn.className = "bi bi-save"
+                        headline.innerHTML = getTextarea(headline.textContent)
+                        headline.className = "p-2"
+                        content.innerHTML = getTextarea(content.textContent.trim(), content.querySelectorAll("br").length.toString())
+
+                        initButtons()
+                    } else if (btn.id === "save") {
+                        btn.id = "edit"
+                        btn.className = "bi bi-pencil"
+                        headline.className = ""
+                        const headlineText = headline.querySelector(".form-control").value
+                        const contentText = content.querySelector(".form-control").value
+                        updatePost(btn.id, headlineText, contentText)
+                    } else if (btn.id === "delete") {
+                        updatePost(btn.id)
+                    } else if (btn.id === "like") {
+                        updatePost(btn.id)
+                        btn.id = "unlike"
+                        btn.classList.remove("bi-heart")
+                        btn.classList.add("bi-heart-fill")
+                    } else if (btn.id === "unlike") {
+                        updatePost(btn.id)
+                        btn.id = "like"
+                        btn.classList.remove("bi-heart-fill")
+                        btn.classList.add("bi-heart")
+                    } else {
+                        back()
+                    }
+                })
+
+                btn.hasEventListner = true
+            }
+        })
+    }
+
+    function addComment() {
+        if (commentView.value.length > 1) {
+            let answerToID = null
+
+            if (label.innerHTML !== '')
+                answerToID = label.querySelector("#commentID").textContent
+
+            fetch('/comment/post', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: post.id, value: commentView.value, answerTo: answerToID})
+            }).then(res => res.text()).then(html => {
+                comments.innerHTML = html
+                initButtons()
+            })
+
+            commentView.value = ''
+            clearLabel()
+        }
+    }
+
+    function updateChallengeButton(status) {
+        if (status) {
+            challengeButton.id = "cancel"
+            challengeButton.classList.remove("btn-success")
+            challengeButton.classList.add("btn-danger")
+            challengeButton.textContent = "Nicht mehr teilnehmen"
+        } else {
+            challengeButton.id = "accept"
+            challengeButton.classList.remove("btn-danger")
+            challengeButton.classList.add("btn-success")
+            challengeButton.textContent = "Aufgabe annehmen"
+        }
+    }
+
+    function updateChallenge(command) {
+        fetch('/challenges', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({value: command, post: post.id})
+        }).then(res => {
+            if (res.ok) {
+                if (command === "accept")
+                    updateChallengeButton(true)
+                else
+                    updateChallengeButton(false)
+
+                initChallengeButton()
+            }
+        })
+    }
+
+    function initChallengeButton() {
+        challengeButton.addEventListener("click", () => {
+            updateChallenge(challengeButton.id)
+        })
+    }
+
+    if (send)
+        send.addEventListener("click", addComment)
+
+    if (challengeButton)
+        initChallengeButton()
+
+    initButtons()
+</script>

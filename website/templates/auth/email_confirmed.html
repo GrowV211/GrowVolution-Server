@@ -1,0 +1,32 @@
+{% extends "auth/base.html" %}
+{% block title %}Bestätigt{% endblock %}
+{% block script %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const timer = document.getElementById("timer")
+            let time = parseInt(timer.textContent)
+
+            const interval = setInterval(function () {
+                time--
+                timer.textContent = time.toString()
+                if (time <= 0) {
+                    clearInterval(interval)
+                    window.location = "{{ homepage }}"
+                }
+            }, 1000)
+
+            document.getElementById("home").addEventListener("click", () => {
+                window.location = "{{ homepage }}"
+            })
+        })
+    </script>
+{% endblock %}
+{% block form_content %}
+    <p class="mb-4 text-center">
+        Vielen Dank, deine E-Mail Adresse ({{ email }}) wurde bestätigt.
+    </p>
+    <div class="d-flex justify-content-center">
+        <button type="button" id="home" class="btn btn-primary w-50" aria-describedby="hint">Nach Hause</button>
+    </div>
+    <div class="d-flex justify-content-center"><span class="form-text" id="hint">Automatische Weiterleitung in <span id="timer">6</span> Sekunden.</span></div>
+{% endblock %}

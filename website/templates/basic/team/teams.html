@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Teams{% endblock %}
+{% block style %}
+    <link href="{{ url_for('static', filename='css/teams.css') }}" rel="stylesheet">
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/account/teams.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="teams-container bg-white rounded shadow">
+
+        </div>
+    </div>
+{% endblock %}

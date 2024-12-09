@@ -1,0 +1,11 @@
+<div class="d-flex list-element align-items-center p-2 border-bottom">
+    <a>
+        {% include "basic/account/profile_image.html" %}
+    </a>
+    <span class="m-2 w-100"><i id="username">{{ username }}</i></span>
+    <div class="container">
+        <div class="float-end">
+            {% include "basic/account/relation/relation_btns.html" %}
+        </div>
+    </div>
+</div>

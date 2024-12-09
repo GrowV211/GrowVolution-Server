@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Fortschritt{% endblock %}
+{% block style %}
+  <link href="{{ url_for('static', filename='css/profile.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-center vh-100">
+    <div class="progress bg-white rounded shadow p-3">
+      <form method="post">
+        <div class="form-group mb-4">
+          <label for="goal" class="form-label">Mein persönliches Ziel</label>
+          <textarea id="goal" class="form-control" name="goal" placeholder="Aktuell möchte ich gerne daran arbeiten, ..." rows="2" required></textarea>
+        </div>
+        <div class="form-group mb-4">
+          <label for="current" class="form-label">Mein aktueller Stand</label>
+          <div id="current" class="form-group m-2">
+            <div class="form-group mb-1">
+              <label for="body" class="form-label">Körperlich</label>
+              <textarea id="body" class="form-control" name="body" placeholder="Ich bin 1,XX m groß, wiege YY kg und habe einen XYZ Körperbau. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="mental" class="form-label">Mental</label>
+              <textarea id="mental" class="form-control" name="mental" placeholder="Ich halte mich selbst für XYZ und denke ständig ZYX. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="relations" class="form-label">Beziehungen</label>
+              <textarea id="relations" class="form-control" name="relations" placeholder="Ich verbringe viel Zeit mit XY, habe YZ viele Freunde und mein Verhältnis zu X ist Y. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="personal" class="form-label">Persönlich</label>
+              <textarea id="personal" class="form-control" name="personal" placeholder="Ich bin ein XY Mensch, kann ZY mit YX umgehen, lege viel Wert auf X und mache regelmäßig Y. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="financial" class="form-label">Finanziell</label>
+              <textarea id="financial" class="form-control" name="financial" placeholder="Ich verdiene X, gebe Y aus und investiere besonders viel in Z. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="career" class="form-label">Beruflich</label>
+              <textarea id="career" class="form-control" name="career" placeholder="Ich arbeite als XY und betreibe nebenbei noch YZ. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="spiritual" class="form-label">Spirituell</label>
+              <textarea id="spiritual" class="form-control" name="spiritual" placeholder="Ich glaube an X, X ist für mich Y und mir ist wichtig, dass Z. (...)" rows="2" required></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="form-group mb-4">
+          <label for="future" class="form-label">Da möchte hin</label>
+          <div id="future" class="form-group m-2">
+            <div class="form-group mb-1">
+              <label for="body_future" class="form-label">Körperlich</label>
+              <textarea id="body_future" class="form-control" name="body_future" placeholder="Ich möchte XX wiegen und YY gebaut sein. Außerdem möchte ich mich Z ernähren und auf XYZ achten. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="mental_future" class="form-label">Mental</label>
+              <textarea id="mental_future" class="form-control" name="mental_future" placeholder="Mir ist es wichtig X zu sein, weniger an Y zu denken und mich aktiver mit Z beschäftigen. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="relations_future" class="form-label">Beziehungen</label>
+              <textarea id="relations_future" class="form-control" name="relations_future" placeholder="Mit XY möchte ich gerne mehr Zeit verbringen und auf YZ mehr Wert legen. Des Weiteren möchte ich gegenüber X mehr Y sein. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="personal_future" class="form-label">Persönlich</label>
+              <textarea id="personal_future" class="form-control" name="personal_future" placeholder="X will ich in Zukunft seltener machen und dafür öfter Y tun. Zudem möchte ich mehr Raum für Z schaffen und XYZ erreichen. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="financial_future" class="form-label">Finanziell</label>
+              <textarea id="financial_future" class="form-control" name="financial_future" placeholder="Ich träume davon X zu verdienen und mehr in Y zu investieren. Außerdem möchte ich X, Y und Z mit meinem Geld umgehen. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group mb-1">
+              <label for="career_future" class="form-label">Beruflich</label>
+              <textarea id="career_future" class="form-control" name="career_future" placeholder="Am liebsten würde ich X machen, wobei mir Y und Z wichtig wären. Nebenbei will ich dann noch XYZ. (...)" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="spiritual_future" class="form-label">Spirituell</label>
+              <textarea id="spiritual_future" class="form-control" name="spiritual_future" placeholder="X soll mir Y geben und ich möchte mich mehr mit Z befassen, weil XY. Was YZ betrifft möchte ich jedoch ZY. (...)" rows="2" required></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="form-group mb-2">
+          <label for="journal" class="form-label">Fragen für mein tägliches Journal</label>
+          <div id="journal" class="form-group m-2" aria-describedby="journal_hint">
+            <div class="form-group mb-1">
+              <label for="question1" class="form-label">Frage 1</label>
+              <input id="question1" type="text" class="form-control" name="q1" placeholder="Wofür bin ich heute besonders dankbar?" required>
+            </div>
+            <div class="form-group mb-1">
+              <label for="question2" class="form-label">Frage 2</label>
+              <input id="question2" type="text" class="form-control" name="q2" placeholder="Worauf kann ich stolz sein?">
+            </div>
+            <div class="form-group mb-1">
+              <label for="question3" class="form-label">Frage 3</label>
+              <input id="question3" type="text" class="form-control" name="q3" placeholder="Was ist mir im Moment wichtig?">
+            </div>
+            <div class="form-group mb-1">
+              <label for="question4" class="form-label">Frage 4</label>
+              <input id="question4" type="text" class="form-control" name="q4" placeholder="Womit möchte ich mich heute unbedingt befassen?">
+            </div>
+            <div class="form-group mb-1">
+              <label for="question5" class="form-label">Frage 5</label>
+              <input id="question5" type="text" class="form-control" name="q5" placeholder="Welche Lektionen habe ich heute gelernt?">
+            </div>
+            <div class="form-group">
+              <label for="journal_time" class="form-label">Wann ich mein Journal machen möchte</label>
+              <select id="journal_time" name="journal_time" class="form-select">
+                <option selected value="evening">Abends</option>
+                <option  value="aftnoon">(Nach-) Mittags</option>
+                <option value="morning">Morgens</option>
+              </select>
+            </div>
+          </div>
+          <span id="journal_hint" class="form-text">Bitte lege mindestens eine Frage (Frage 1) fest.</span>
+        </div>
+        <button type="submit" class="btn btn-success m-2" style="width: 98%;">Abschicken</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

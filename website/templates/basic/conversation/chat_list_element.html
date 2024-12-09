@@ -1,0 +1,10 @@
+<div class="d-flex list-element align-items-center p-2 border-bottom">
+    <a>
+        {% include "basic/account/profile_image.html" %}
+    </a>
+    <div style="margin-left: 15px">
+        <span id="username"><b>{{ username }}</b></span>
+        <span id="{{ username }}" style="color: grey; display: {{ 'block' if message else 'none' }}">{{ message }}</span>
+    </div>
+    <span id="messages {{ username }}" class="unread ms-auto" style="display: {{ 'iniline-block' if unread_messages else 'none' }}">{{ unread_messages }}</span>
+</div>

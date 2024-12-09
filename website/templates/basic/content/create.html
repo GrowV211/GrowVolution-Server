@@ -1,0 +1,71 @@
+<form id="form" method="post">
+    <div class="d-flex flex-column justify-content-center p-3">
+        <div class="container" id="nav-container">
+            <i id="back" class="bi bi-arrow-left float-end"></i>
+        </div>
+        <div class="form-group mb-3">
+            <label for="headline" class="form-label">Überschrift</label>
+            <input type="text" class="form-control" id="headline" name="headline" placeholder="Mein Thema heute..." required></input>
+        </div>
+        <div class="form-group mb-3">
+            <label for="body" class="form-label">Inhalt</label>
+            <textarea class="form-control" id="body" name="body" placeholder="Aktuell ist es meine größte Herausforderung..." rows="4" required></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label for="category" class="form-label">Kategorie</label>
+            <select class="form-select" id="category" name="category">
+                <optgroup label="Persönlich">
+                    <option selected value="💬">💬 - Allgemeines</option>
+                    <option value="👫">👫 - Beziehungen</option>
+                    <option value="️❤️">❤️ - Dating</option>
+                    <option value="💼">💼 - Karriere</option>
+                    <option value="🌱">🌱 - Gesundheit</option>
+                    <option value="🔮">🔮 - Spirituelles</option>
+                </optgroup>
+                <optgroup label="Global">
+                    <option value="🏅">🏅 - Aufgaben</option>
+                    <option value="🌍">🌍 - Diskussionen</option>
+                </optgroup>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Veröffentlichen</button>
+    </div>
+</form>
+<script>
+    function back() {
+        fetch(window.location, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({value: 'profile'})
+        }).then(res => res.text()).then(html => {
+            container.innerHTML = html
+            init()
+        })
+    }
+
+    document.getElementById("form").addEventListener("submit", (event) => {
+        event.preventDefault()
+
+        const form = event.target
+
+        if (!form.checkValidity()) {
+            form.reportValidity()
+            return
+        }
+
+        const formData = new FormData(form)
+
+        fetch("/content/create", {
+            method: "POST",
+            body: formData
+        }).then(res =>  {
+            if (res.ok) {
+                back()
+            }
+        })
+    })
+
+    document.getElementById("back").addEventListener("click", () => {
+        back()
+    })
+</script>

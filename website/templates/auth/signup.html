@@ -1,0 +1,43 @@
+{% extends "auth/base.html" %}
+{% block title %}Registrieren{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/auth/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth/signup.js') }}"></script>
+{% endblock %}
+{% block form_content %}
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="first" class="form-label">Vorname</label>
+                <input type="text" id="first" name="first" class="form-control" placeholder="Max" aria-describedby="name-hint" required>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="last" class="form-label">Nachname</label>
+                <input type="text" id="last" name="last" class="form-control" placeholder="Mustermann" aria-describedby="name-hint" required>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center text-center mb-3"><span class="form-text" id="name-hint">Stelle bitte sicher deinen richtigen Namen zu verwenden.<br>Du kannst ihn im Anschluss nicht mehr ändern.</span></div>
+    <div class="mb-3">
+        <label for="user" class="form-label">Nutzername</label>
+        <input type="text" id="user" name="user" class="form-control" placeholder="mustermax123" aria-describedby="username_warning" required>
+        <span id="username_warning" class="text-danger" style="display: none">Benutzername nicht verfügbar.</span>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">E-Mail Adresse</label>
+        <input type="text" id="email" name="email" class="form-control" placeholder="max@muster.de" aria-describedby="email_warning" required>
+        <span id="email_warning" class="text-danger" style="display: none">E-Mail Adresse bereits in Verwendung. <a href="/login">Hier anmelden?</a></span>
+    </div>
+    <div class="mb-3">
+        <label for="pass" class="form-label">Passwort</label>
+        <div class="input-group">
+            <input type="password" id="pass" name="psw" class="form-control" placeholder="************" aria-describedby="show_hide" required>
+            <button class="btn btn-outline-secondary" type="button" id="show_hide">anzeigen</button>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary w-50">Registrieren</button>
+    </div>
+{% endblock %}
