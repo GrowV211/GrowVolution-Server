@@ -4,22 +4,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const email = document.getElementById("email");
     const e_warn = document.getElementById("email_warning");
 
-    function warn_display(e, type, display) {
+    SOCKET.on('availability_response', (data) => {
+        if (data.available && data.type === 'email')
+            e_warn.style.display = 'block'
+
+        else if (data.available)
+            u_warn.style.display = 'block'
+
+        else {
+            e_warn.style.display = 'none'
+            u_warn.style.display = 'none'
+        }
+    })
+
+    function warn_display(e, type) {
         const value = e.target.value
 
         if (type === 'email' && !value.includes('@'))
             return
 
-        fetch('/availability-check', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: value, type: type})
-        }).then(res => res.json()).then(data => {
-            if (data['available'])
-                display.style.display = 'block';
-            else
-                display.style.display = 'none';
-        });
+        SOCKET.emit('availability_check', {
+            type: type,
+            value: value
+        })
     }
 
     username.addEventListener("input", function (e) {

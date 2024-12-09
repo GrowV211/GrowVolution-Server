@@ -1,36 +1,29 @@
 let form
 
-async function updateForm(value, data = null) {
-    const res = await fetch('/auth/forgot-password', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({value: value, data: data})
-    })
-
-    if (res.headers.get('Content-Type').includes('application/json')) {
-        const json = await res.json()
-        const url = json['value']
-
-        if (url)
-            window.location = url
-    } else {
-        form.innerHTML = await res.text()
-
-        if (value === 'login') {
-            init()
-            return
-        }
-
-        form.querySelectorAll("script").forEach(script => {
-            eval(script.innerText)
-        })
-    }
-}
-
 function init() {
     form = document.getElementById("auth")
     const show_hide_btn = document.getElementById("show_hide");
     const password = document.getElementById("pass");
+    const help = document.getElementById("help")
+
+    SOCKET.on('update', (data) => {
+        const value = data.value
+
+        if (value === 'html') {
+            form.innerHTML = data.html
+
+            if (data.type === 'login') {
+                init()
+                return
+            }
+
+            form.querySelectorAll("script").forEach(script => {
+                eval(script.innerText)
+            })
+        } else {
+            window.location = data.url
+        }
+    })
 
     show_hide_btn.addEventListener("click", function (e) {
         if (password.type === "password") {
@@ -42,11 +35,11 @@ function init() {
         }
     });
 
-    document.querySelectorAll("#help").forEach((help) => {
+    if (help) {
         help.addEventListener("click", () => {
-            updateForm('forgot')
+            SOCKET.emit('forgot_query', { value: 'forgot' })
         })
-    })
+    }
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -1,7 +1,13 @@
 let SOCKET
 
 function connectSocket() {
-    return io.connect('https://growvolution.org')
+    return io('https://growvolution.org', {
+      reconnection: true,          // Aktiviert die automatische Wiederverbindung
+      reconnectionAttempts: 5,     // Anzahl der Versuche
+      reconnectionDelay: 1000,     // Wartezeit vor dem ersten Versuch (in ms)
+      reconnectionDelayMax: 5000,  // Maximale Wartezeit zwischen den Versuchen (in ms)
+      timeout: 20000               // Verbindungs-Timeout (in ms)
+    })
 }
 
 function flash(message, category) {
@@ -36,11 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     SOCKET = connectSocket()
 
-    SOCKET.on('no_user', SOCKET.disconnect)
-
     SOCKET.on('update_messages', (data) => {
-        let type = data.msgType
-        const user = data.usr
+        let type = data.type
+        const user = data.user
         if (user) type = `${type} ${user}`
 
         const element = document.getElementById(type)
@@ -59,13 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (user) {
                 const last = document.getElementById(user)
-                const last_msg = data.lastMsg
-                if (last_msg) {
-                    last.style.display = "block"
-                    last.textContent = last_msg
-                } else {
-                    last.style.display = "none"
-                }
+                last.style.display = "block"
+                last.textContent = data.last
             }
         } else {
             element.style.display = "none"
@@ -76,10 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     SOCKET.on('disconnect', () => {
-        SOCKET.disconnect()
-
-        setTimeout(() => {
-            SOCKET = connectSocket()
-        }, 2500)
+        console.warn("Socket disconnected... reconnecting.")
     })
 })

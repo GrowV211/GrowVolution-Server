@@ -1,6 +1,6 @@
 from flask import jsonify
 from website.temporary import CONFIRM, RESET, lock, time_locked
-from website.messaging import send_confirm_mail, send_reset_link
+from website.mailservice import send_confirm_mail, send_reset_link
 from website.data import User
 
 

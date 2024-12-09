@@ -1,6 +1,5 @@
-from flask import request, redirect
 from website.basic import render
-from website.data import User, Chat, add_model, delete_model
+from website.data import User, Chat, Chatroom, add_model, delete_model
 from website.logic.account.user import user_attributes
 from website.logic.auth.verify import active_user
 from markupsafe import Markup
@@ -10,7 +9,7 @@ def _render_date(date):
     return render('basic/conversation/message_date.html', date=date)
 
 
-def _render_message(direction, message):
+def render_message(direction, message):
     return render('basic/conversation/chat_message.html', direction=direction,
                   username=message.sender.username, message=message.get_content(), time=message.time())
 
@@ -32,7 +31,7 @@ def get_chat_html(chat, receiver):
             direction = 'received'
             msg.set_read()
 
-        chat_html += _render_message(direction, msg)
+        chat_html += render_message(direction, msg)
 
     return Markup(chat_html)
 
@@ -64,6 +63,20 @@ def delete_chat(user, receiver):
         delete_model(chat)
 
 
-def render_chat(receiver, receiver_attributes, chat):
+def render_chat(receiver, receiver_attributes, chat, back_destination):
     return render('basic/conversation/chat_inner.html', type='chat-user', user=receiver_attributes,
-                  name=receiver.name(), username=receiver.username, chat=get_chat_html(chat, receiver))
+                  name=receiver.name(), username=receiver.username, chat=get_chat_html(chat, receiver),
+                  destination=back_destination)
+
+
+def handle_request(data, socket):
+    receiver = User.query.filter_by(username=data['username']).first()
+    user = active_user()
+
+    chat = get_chat(user, receiver)
+
+    chatroom = Chatroom(socket, chat.id)
+    add_model(chatroom)
+
+    return Markup(render_chat(receiver, user_attributes(receiver, False),
+                              chat, data['destination']))

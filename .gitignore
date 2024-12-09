@@ -1,4 +1,5 @@
 *.env
+/.venv/
 /website/static/img/
 /website/static/proof/
 /website/logs/

@@ -6,6 +6,7 @@ from .auth.verify import active_user
 from .content.content import get_post_html
 from markupsafe import Markup
 
+
 EXCLUDED = [
     '🏅'.encode('unicode_escape').decode('ascii'),
     '🌍'.encode('unicode_escape').decode('ascii')

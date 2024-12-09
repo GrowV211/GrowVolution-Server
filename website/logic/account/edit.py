@@ -4,7 +4,7 @@ from website.basic import render, goto_login
 from werkzeug.utils import secure_filename
 from website.data import User
 from website.temporary import new_process, lifecycle, TEN_MINUTES, CONFIRM, time_locked, lock
-from website.messaging import send_confirm_mail
+from website.mailservice import send_confirm_mail
 from website.logic.auth.verify import active_user
 from .user import user_attributes
 from pathlib import Path

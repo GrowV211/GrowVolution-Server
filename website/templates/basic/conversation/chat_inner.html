@@ -76,13 +76,22 @@
             username: '{{ username }}',
             content: content
         })
+
+        message.value = ''
     })
 
-    SOCKET.on("update_chat", (data) => {
-        chat.innerHTML = data.chat
+    function scrollToBottom() {
+        chat.scrollTop = chat.scrollHeight
+    }
+
+    scrollToBottom()
+
+    SOCKET.on("update_chat", (html) => {
+        chat.innerHTML += html
+        scrollToBottom()
     })
 
     document.getElementById("back").addEventListener("click", () => {
-        SOCKET.emit("close_chatroom", '{{ destination }}')
+        SOCKET.emit("back", '{{ destination }}')
     })
 </script>

@@ -16,31 +16,24 @@
 <script>
     const email = document.getElementById("email")
 
-    async function checkAvailable(value) {
-
-        const res = await fetch('/availability-check', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({type: 'email', value: value})
-        })
-
-        const data = await res.json()
-
-        return !!data['available']
-    }
+    SOCKET.on('availability_response', (data) => {
+        if (data.available)
+            SOCKET.emit('forgot_query', {
+                value: 'reset-link',
+                data: email.value
+            })
+        else
+            alert("Für diese E-Mail Adresse existiert kein Account.")
+    })
 
     document.getElementById("request").addEventListener("click", () => {
-        const value = email.value
-
-        checkAvailable(value).then(available => {
-            if (available)
-                updateForm('reset-link', value)
-            else
-                alert("Für diese E-Mail Adresse existiert kein Account.")
+        SOCKET.emit('availability_check', {
+            type: 'email',
+            value: email.value
         })
     })
 
     document.getElementById("back").addEventListener("click", () => {
-        updateForm('login')
+        SOCKET.emit('back', 'login')
     })
 </script>

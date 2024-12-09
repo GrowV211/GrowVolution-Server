@@ -1,16 +1,18 @@
-from flask import request, jsonify
 from website.basic import render
 from website.temporary import RESET, lifecycle, new_process, TEN_MINUTES
-from website.messaging import send_reset_link
+from website.mailservice import send_reset_link
 from website.data import User
+from markupsafe import Markup
 
-
-def handle_request():
-    data = request.get_json()
+def handle_request(data):
     value = data.get('value')
 
     if value == 'forgot':
-        return render('auth/forgot.html')
+        return {
+            'value': 'html',
+            'html': Markup(render('auth/forgot.html')),
+            'type': 'forgot'
+        }
 
     elif value == 'reset-link':
         email = data.get('data')
@@ -20,7 +22,7 @@ def handle_request():
         code = send_reset_link(email, user.first)
         lifecycle(RESET, pid, (code, user.id), TEN_MINUTES)
 
-        return jsonify(value=f'https://growvolution.org/notice/{pid}')
-
-    elif value == 'login':
-        return render('auth/login_form.html')
+        return {
+            'value': 'url',
+            'url': f'https://growvolution.org/notice/{pid}'
+        }

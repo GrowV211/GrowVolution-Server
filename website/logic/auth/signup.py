@@ -1,7 +1,7 @@
 from flask import request, redirect
 from website.basic import render,render_with_flash
 from website.data import User, add_model
-from website.messaging import send_confirm_mail
+from website.mailservice import send_confirm_mail
 from website.temporary import lifecycle, new_process, TEN_MINUTES, CONFIRM
 import random
 

@@ -2,12 +2,18 @@ function init() {
     const container = document.querySelector(".chats-container")
     const chats = document.querySelectorAll(".list-element")
 
-    SOCKET.on("update_container", (html) => {
-        container.innerHTML = html
+    SOCKET.emit('set_tab', 'chats')
 
-        container.querySelectorAll("script").forEach(script => {
-            eval(script.innerText)
-        })
+    SOCKET.on("update", (data) => {
+        container.innerHTML = data.html
+
+        if (data.type === 'chats')
+            init()
+
+        else
+            container.querySelectorAll("script").forEach(script => {
+                eval(script.innerText)
+            })
     })
 
     chats.forEach(chat => {

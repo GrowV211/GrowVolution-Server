@@ -3,8 +3,7 @@ from website.data import User
 from website.logic.auth.verify import active_user
 
 
-def handle_request():
-    data = request.get_json()
+def handle_request(data):
     available = False
 
     if data['type'] == 'username':
@@ -15,4 +14,7 @@ def handle_request():
         if user and user != active_user():
             available = True
 
-    return jsonify(available=available)
+    return {
+        'type': data['type'],
+        'available': available
+    }

@@ -3,6 +3,8 @@ function init() {
 
     container.style.background = "#cccccc"
 
+    SOCKET.emit('set_tab', 'home')
+
     function updateContainer(post) {
         fetch(window.location, {
                 method: 'POST',
