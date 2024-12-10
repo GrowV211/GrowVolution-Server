@@ -2,27 +2,37 @@ function init() {
     const container = document.querySelector(".chats-container")
     const chats = document.querySelectorAll(".list-element")
 
-    SOCKET.emit('set_tab', 'chats')
+    setTab('chats')
 
-    SOCKET.on("update", (data) => {
-        container.innerHTML = data.html
+    function onUpdate(data) {
+        let html
+        let type
 
-        if (data.type === 'chats')
+        if (typeof data === 'string') {
+            html = data
+            type = 'chat'
+        } else {
+            html = data.html
+            type = data.type
+        }
+
+        container.innerHTML = html
+
+        if (type === 'chats')
             init()
 
         else
             container.querySelectorAll("script").forEach(script => {
                 eval(script.innerText)
             })
-    })
+    }
+
+    updateEventHandler = onUpdate
 
     chats.forEach(chat => {
         chat.addEventListener("click", () => {
             const username = chat.querySelector("#username").textContent.trim()
-            SOCKET.emit("open_chatroom", {
-                username: username,
-                destination: 'chats'
-            })
+            joinChat(username)
         })
     })
 }

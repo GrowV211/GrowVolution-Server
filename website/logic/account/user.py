@@ -57,9 +57,9 @@ def render_profile(user, inner, current, img_timestamp = False):
                   content=get_content_html(user))
 
 
-def _handle_fetch(user, current):
+def handle_interaction(user, current, data):
     global EDITING
-    value = request.get_json()['value']
+    value = data['value']
 
     if value == 'edit' and current:
         EDITING[user.id] = True
@@ -70,11 +70,6 @@ def _handle_fetch(user, current):
     elif value == 'settings' and current:
         from .settings import render_settings
         return render_settings()
-
-    elif value == 'chat':
-        from website.logic.conversation.chat import render_chat, get_chat
-        return render_chat(user, user_attributes(user, False), get_chat(active_user(), user))
-
 
     elif value == 'new_post':
         return render_create_view()
@@ -113,8 +108,5 @@ def handle_request(username):
 
     if not user:
         return render_404()
-
-    if request.is_json:
-        return _handle_fetch(user, current)
 
     return render_profile(user, False, current)

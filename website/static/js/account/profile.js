@@ -5,13 +5,19 @@ function init() {
     const link = document.getElementById("linkText")
     const copied = document.getElementById("copied")
 
+    const username = document.getElementById("username").textContent
+    setTab(username)
+
     function initButtons() {
         document.getElementById("nav-container")
         .querySelectorAll(".bi, .relation-btn")
         .forEach((icon) => {
             if (icon.id !== 'share') {
                 icon.addEventListener("click", () => {
-                    updateContainer(icon.id)
+                    if (icon.id === 'chat')
+                        joinChat(username)
+                    else
+                        updateContainer(icon.id)
                 })
             }
         })
@@ -28,20 +34,23 @@ function init() {
         })
     }
 
+    function onUpdate(html) {
+        container.innerHTML = html
+
+        container.querySelectorAll("script").forEach(script => {
+            eval(script.innerText)
+        })
+
+        initButtons()
+        initContent()
+    }
+
+    updateEventHandler = onUpdate
+
     function updateContainer(request, post=null) {
-        fetch(window.location, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: request, post: post })
-        }).then(res => res.text()).then(html => {
-            container.innerHTML = html
-
-            container.querySelectorAll("script").forEach(script => {
-                eval(script.innerText)
-            })
-
-            initButtons()
-            initContent()
+        profileInteraction({
+            value: request,
+            post: post
         })
     }
 

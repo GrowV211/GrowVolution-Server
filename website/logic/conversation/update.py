@@ -21,8 +21,8 @@ def handle_request(data, socket):
 
     for chatroom in chatrooms:
         if chatroom.socketID != socket:
-            from website.socket import send_update
-            send_update(chatroom.socketID, 'update_chat', Markup(render_message('received', message)))
+            from ..socket.manage import send_message
+            send_message('update_chat', Markup(render_message('received', message)), chatroom.socketID)
             message.set_read()
             updated = True
 

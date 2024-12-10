@@ -63,20 +63,6 @@ def delete_chat(user, receiver):
         delete_model(chat)
 
 
-def render_chat(receiver, receiver_attributes, chat, back_destination):
+def render_chat(receiver, receiver_attributes, chat):
     return render('basic/conversation/chat_inner.html', type='chat-user', user=receiver_attributes,
-                  name=receiver.name(), username=receiver.username, chat=get_chat_html(chat, receiver),
-                  destination=back_destination)
-
-
-def handle_request(data, socket):
-    receiver = User.query.filter_by(username=data['username']).first()
-    user = active_user()
-
-    chat = get_chat(user, receiver)
-
-    chatroom = Chatroom(socket, chat.id)
-    add_model(chatroom)
-
-    return Markup(render_chat(receiver, user_attributes(receiver, False),
-                              chat, data['destination']))
+                  name=receiver.name(), username=receiver.username, chat=get_chat_html(chat, receiver))

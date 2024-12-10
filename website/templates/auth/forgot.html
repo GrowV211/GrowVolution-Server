@@ -16,24 +16,24 @@
 <script>
     const email = document.getElementById("email")
 
-    SOCKET.on('availability_response', (data) => {
+    function onAvailabilityResponse(data) {
         if (data.available)
-            SOCKET.emit('forgot_query', {
+            forgotQuery({
                 value: 'reset-link',
                 data: email.value
             })
         else
             alert("Für diese E-Mail Adresse existiert kein Account.")
-    })
+    }
+
+    availabilityResponseHandler = onAvailabilityResponse
 
     document.getElementById("request").addEventListener("click", () => {
-        SOCKET.emit('availability_check', {
+        availabilityCheck({
             type: 'email',
             value: email.value
         })
     })
 
-    document.getElementById("back").addEventListener("click", () => {
-        SOCKET.emit('back', 'login')
-    })
+    document.getElementById("back").addEventListener("click", back)
 </script>

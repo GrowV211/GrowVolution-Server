@@ -29,21 +29,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let interval = setInterval(timer, 1000)
 
+    function onResendInfo(lockTime) {
+        time = lockTime
+        init_lock()
+        interval = setInterval(timer, 1000)
+    }
+
+    resendInfoEventHandler = onResendInfo
+
     resend.addEventListener("click", () => {
         const domain_parts = window.location.href.split('/')
         const pid = domain_parts[domain_parts.length - 1]
 
         init_lock()
 
-        fetch(`/resend/${pid}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: 'resend'})
-        }).then(res => res.json()).then(data => {
-            time = data['lock_time']
-            init_lock()
-            interval = setInterval(timer, 1000)
-        })
+        resendMail(pid)
     })
 
 })

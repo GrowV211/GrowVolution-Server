@@ -1,7 +1,7 @@
-from website import APP, init_app
+import eventlet
+eventlet.monkey_patch()
 
-HOST = "127.0.0.1"
-PORT = 5000
+from website import APP, init_app
 
 init_app()
 

@@ -1,6 +1,6 @@
-from flask import request, jsonify
+from flask import request
 from website import APP
-from website.basic import render, goto_login
+from website.basic import render
 from werkzeug.utils import secure_filename
 from website.data import User
 from website.temporary import new_process, lifecycle, TEN_MINUTES, CONFIRM, time_locked, lock
@@ -34,16 +34,32 @@ def _rename_image(user, new_username):
         user.set_img(filename)
 
 
-def _handle_json(user):
-    value = request.get_json()['value']
+def handle_delete():
+    user = active_user()
+    _delete_image(user)
+    return render(IMAGE_TEMPLATE, user=user_attributes(user, False))
 
-    if value == 'delete':
-        _delete_image(user)
+def handle_reset_request():
+    user = active_user()
+    email = user.email
 
-        return render(IMAGE_TEMPLATE, user=user_attributes(user, False))
+    temporary = _get_temporary_mail(user.id)
+    if temporary:
+        email = temporary[0]
 
-    elif value == 'reset':
-        return jsonify(user=user.username, email=user.email, info=user.info)
+    return {
+        'user': user.username,
+        'email': email,
+        'info': user.info
+    }
+
+
+def _get_temporary_mail(user):
+    for k, v in CONFIRM.items():
+        if isinstance(v[2], tuple) and v[2][0] == user:
+            return [v[2][1], k]
+
+    return None
 
 
 def render_edit(user, attributes):
@@ -51,13 +67,13 @@ def render_edit(user, attributes):
     change = 0
     lock_time = 0
     pid = ''
-    for k, v in CONFIRM.items():
-        if isinstance(v[2], tuple) and v[2][0] == user.id:
-            email = v[2][1]
-            change = 1
-            pid = k
-            lock_time = time_locked(pid)
-            break
+
+    temporary = _get_temporary_mail(user.id)
+    if temporary:
+        email = temporary[0]
+        pid = temporary[1]
+        lock_time = time_locked(pid)
+        change = 1
 
     return render('basic/account/edit.html', username=user.username,
                   user=attributes, first=user.first, last=user.last,
@@ -68,12 +84,6 @@ def render_edit(user, attributes):
 
 def handle_request():
     user = active_user()
-
-    if not user:
-        return goto_login(), 500
-
-    if request.is_json:
-        return _handle_json(user)
 
     if 'img' in request.files:
         img = request.files['img']
@@ -89,12 +99,16 @@ def handle_request():
 
         return render(IMAGE_TEMPLATE, user=user_attributes(user, True))
 
-    usr = request.form.get('user')
-    email = request.form.get('email')
-    info = request.form['info']
 
-    user_hint = 0
-    email_hint = 0
+def handle_edit(data):
+    user = active_user()
+
+    usr = data.get('user')
+    email = data.get('email')
+    info = data['info']
+
+    user_hint = False
+    email_hint = False
     lock_user = ''
     lock_email = 0
     pid = ''
@@ -102,7 +116,7 @@ def handle_request():
     if usr and usr != user.username:
         user.set_username(usr)
         _rename_image(user, usr)
-        user_hint = 1
+        user_hint = True
         lock_user = str(user.username_lock_time())
 
     if email and email != user.email:
@@ -110,12 +124,17 @@ def handle_request():
         code = send_confirm_mail(email, user.first)
         lifecycle(CONFIRM, pid, (code, _confirm, (user.id, email)), TEN_MINUTES)
         lock(pid)
-        email_hint = 1
+        email_hint = True
         lock_email = time_locked(pid)
         pid = pid
 
     if info != user.info:
         user.set_info(info)
 
-    return jsonify(user_hint=user_hint, email_hint=email_hint, lock_user=lock_user,
-                   lock_email=lock_email, pid=pid, img=user.img if user.img else "Kein Bild vorhanden...")
+    return {
+        'user_hint': user_hint,
+        'email_hint': email_hint,
+        'lock_user': lock_user,
+        'lock_email': lock_email,
+        'pid': pid
+    }

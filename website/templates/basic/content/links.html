@@ -22,16 +22,7 @@
         })
     }
 
-    document.getElementById("back").addEventListener("click", () => {
-        fetch(window.location, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: 'profile'})
-        }).then(res => res.text()).then(html => {
-            container.innerHTML = html
-            init()
-        })
-    })
+    document.getElementById("back").addEventListener("click", back)
 
     initSocials()
 </script>

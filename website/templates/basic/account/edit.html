@@ -62,7 +62,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-          <img id="preview">
+          <div class="d-flex flex-column align">
+              <div id="previewContainer">
+                  <img id="preview">
+              </div>
+              <div id="progress" class="flex-column align-items-center m-2" style="display: none;">
+                  <progress id="progressBar" class="progress-bar" value="0" max="100"></progress>
+                  <span id="progressText"></span>
+              </div>
+          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
@@ -75,6 +83,10 @@
 <script>
     const img_input = document.getElementById("img_input")
     const img_preview = document.getElementById("preview")
+    const previewContainer = document.getElementById("previewContainer")
+    const progressContainer = document.getElementById("progress")
+    const progressBar = document.getElementById("progressBar")
+    const progressText = document.getElementById("progressText")
     const edit_modal = new bootstrap.Modal(document.getElementById('edit_modal'), {});
     let cropper
     const img_name = document.getElementById("img_name")
@@ -140,36 +152,34 @@
 
         let interval = setInterval(locktimer, 1000)
 
+        function onResetInfo(lockTime) {
+            time = lockTime
+            interval = setInterval(locktimer, 1000)
+        }
+        resendInfoEventHandler = onResetInfo
+
         resend.addEventListener("click", () => {
             if (locked)
                 return
 
-            fetch(`/resend/${pid}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: 'resend'})
-            }).then(res => res.json()).then(data => {
-                time = data['lock_time']
-                interval = setInterval(locktimer, 1000)
-            })
+            resendMail(pid)
         })
     }
 
     if (email_change)
         onEmailChange()
 
-    function availability_check(value, type, display) {
-        fetch('/availability-check', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: value, type: type})
-        }).then(res => res.json()).then(data => {
-            if (data['available'])
-                display.style.display = 'block';
-            else
-                display.style.display = 'none';
-        });
+    function onAvailabilityResponse(data) {
+        if (data['available'] && data['type'] === 'username')
+            user_warn.style.display = 'block'
+        else if (data['available'])
+            email_warn.style.display = 'block'
+        else {
+            user_warn.style.display = 'none'
+            email_warn.style.display = 'none'
+        }
     }
+    availabilityResponseHandler = onAvailabilityResponse
 
     user.addEventListener("input", (e) => {
         const value = e.target.value
@@ -177,7 +187,10 @@
         if (value === '{{ username }}')
             return
 
-        availability_check(value, 'username', user_warn)
+        availabilityCheck({
+            type: 'username',
+            value: value
+        })
     })
 
     email.addEventListener("input", (e) => {
@@ -188,7 +201,10 @@
             return
         }
 
-        availability_check(value, 'email', email_warn)
+        availabilityCheck({
+            type: 'email',
+            value: value
+        })
     })
 
     img_input.addEventListener("change", function (event) {
@@ -222,76 +238,97 @@
         cropper.getCroppedCanvas().toBlob((blob) => {
             const data = new FormData()
             data.append("img", blob, "{{ username }}.jpg")
-            fetch("/edit", {
-                method: "POST",
-                body: data
-            }).then(res => res.text()).then(data => {
-                edit_modal.hide()
-                img_name.textContent = "{{ username }}.jpg"
-                profile_img.innerHTML = data
+
+            progressContainer.style.display = 'flex'
+            previewContainer.style.display = 'none'
+
+            function hideProgress() {
+                progressContainer.style.display = 'none'
+                previewContainer.style.display = 'block'
+            }
+
+            const xhr = new XMLHttpRequest()
+            xhr.open('POST', '/edit', true)
+
+            xhr.upload.addEventListener("progress", (event) => {
+                if (event.lengthComputable) {
+                    const completed = (event.loaded / event.total) * 100
+                    progressBar.value = completed
+                    progressText.textContent = `Bild wird hochgeladen: ${Math.round(completed)}%`
+                }
             })
+
+            xhr.addEventListener("load", () => {
+                if (xhr.status === 200) {
+                    edit_modal.hide()
+                    img_name.textContent = "{{ username }}.jpg"
+                    profile_img.innerHTML = xhr.responseText
+
+                    hideProgress()
+                } else {
+                    progressText.textContent = `Fehler beim hochladen der Datei. (${xhr.status})`
+                    setTimeout(hideProgress, 2500)
+                }
+            })
+
+            xhr.addEventListener("error", () => {
+                progressText.textContent = "Beim Hochladen der Datei ist ein Fehler aufgetreten."
+                setTimeout(hideProgress, 2500)
+            })
+
+            xhr.send(data)
         })
     }
     document.getElementById("upload").addEventListener("click", uploadImage)
+
+    function onDeletePP(html) {
+        img_name.textContent = "Kein Bild vorhanden..."
+        profile_img.innerHTML = html
+    }
+    deletePPEventHandler = onDeletePP
 
     function del() {
         if (!profile_img.querySelector("img"))
             return
 
         img_name.textContent = "Wird gelöscht..."
-        fetch("/edit", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: 'delete'})
-        }).then(res => res.text()).then(data => {
-            img_name.textContent = "Kein Bild vorhanden..."
-            profile_img.innerHTML = data
-        })
+        deletePP()
     }
     document.getElementById("del").addEventListener("click", del)
 
-    function reset() {
-        fetch("/edit", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: 'reset'})
-        }).then(res => res.json()).then(data => {
-            user.value = data['user']
-            email.value = data['email']
-            info.value = data['info']
-        })
+    function onEditReset(data) {
+        user.value = data['user']
+        email.value = data['email']
+        info.value = data['info']
     }
-    document.getElementById("reset").addEventListener("click", reset)
+    editResetEventHandler = onEditReset
+    document.getElementById("reset").addEventListener("click", resetEdit)
+
+    function onProfileEdit(data) {
+        if (data['user_hint']) {
+            username_edit_lock(data['lock_user'])
+            img_name.textContent = data['img']
+        }
+
+        if (data['email_hint']) {
+            email_hint.style.display = "block"
+            onEmailChange(data['lock_email'], data['pid'])
+        }
+    }
+    profileEditEventHandler = onProfileEdit
 
     document.getElementById("form").addEventListener("submit", (event) => {
         event.preventDefault()
 
         const formData = new FormData(event.target)
+        const json = {}
 
-        fetch("/edit", {
-            method: "POST",
-            body: formData
-        }).then(res =>  res.json()).then(data => {
-            if (data['user_hint']) {
-                username_edit_lock(data['lock_user'])
-                img_name.textContent = data['img']
-            }
-
-            if (data['email_hint']) {
-                email_hint.style.display = "block"
-                onEmailChange(data['lock_email'], data['pid'])
-            }
+        formData.forEach((value, key) => {
+            json[key] = value
         })
+
+        editProfile(json)
     })
 
-    document.getElementById("back").addEventListener("click", () => {
-        fetch(window.location, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: 'profile'})
-        }).then(res => res.text()).then(html => {
-            comments.innerHTML = html
-            init()
-        })
-    })
+    document.getElementById("back").addEventListener("click", back)
 </script>

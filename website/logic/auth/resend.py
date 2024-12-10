@@ -19,7 +19,7 @@ def handle_request(pid):
 
         lock(pid)
 
-        return jsonify(lock_time=time_locked(pid))
+        return time_locked(pid)
 
     elif pid in RESET:
         data = RESET[pid]
@@ -30,4 +30,4 @@ def handle_request(pid):
 
         lock(pid)
 
-        return jsonify(lock_time=time_locked(pid))
+        return time_locked(pid)

@@ -6,7 +6,7 @@ function init() {
     const password = document.getElementById("pass");
     const help = document.getElementById("help")
 
-    SOCKET.on('update', (data) => {
+    function onUpdateEvent(data) {
         const value = data.value
 
         if (value === 'html') {
@@ -23,7 +23,9 @@ function init() {
         } else {
             window.location = data.url
         }
-    })
+    }
+
+    updateEventHandler = onUpdateEvent
 
     show_hide_btn.addEventListener("click", function (e) {
         if (password.type === "password") {
@@ -36,8 +38,9 @@ function init() {
     });
 
     if (help) {
+        setTab('login')
         help.addEventListener("click", () => {
-            SOCKET.emit('forgot_query', { value: 'forgot' })
+            forgotQuery({ value: 'forgot' })
         })
     }
 }

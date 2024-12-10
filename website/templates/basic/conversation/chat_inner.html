@@ -72,7 +72,7 @@
             return
         }
 
-        SOCKET.emit("chat_message", {
+        sendChatMessage({
             username: '{{ username }}',
             content: content
         })
@@ -86,12 +86,12 @@
 
     scrollToBottom()
 
-    SOCKET.on("update_chat", (html) => {
+    function chatUpdate(html) {
         chat.innerHTML += html
         scrollToBottom()
-    })
+    }
 
-    document.getElementById("back").addEventListener("click", () => {
-        SOCKET.emit("back", '{{ destination }}')
-    })
+    chatMessageEventHandler = chatUpdate
+
+    document.getElementById("back").addEventListener("click", back)
 </script>

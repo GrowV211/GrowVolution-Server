@@ -22,11 +22,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <p id="linkText">{{ homepage }}user/{{ username }}</p>
+                    <p id="linkText">https://growvolution.org/user/{{ username }}</p>
                     <p id="copied" class="text-success" style="display: none"><i class="bi bi-check"></i>Link kopiert!</p>
                     <button id="copyButton" class="btn btn-secondary mt-2">Link kopieren</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <span id="username" style="display: none">{{ username }}</span>
 {% endblock %}

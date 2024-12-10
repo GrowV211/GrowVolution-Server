@@ -1,7 +1,7 @@
 from flask import Blueprint
 from . import ALL_METHODS
 from .basic import render, render_404
-from .logic.account import user, relation, progress as p, journal as j, accepted as a
+from .logic.account import user, relation, progress as p, journal as j, accepted as a, edit as e
 from .logic.conversation import chats
 from .logic.content import challenges as c
 from .logic.moderation import mod, admin
@@ -104,3 +104,9 @@ def ranking():
 @views.route('/<path:path>')
 def not_found(path):
     return render_404()
+
+
+# Fetch Only
+@views.route('/edit', methods=['POST'])
+def edit():
+    return e.handle_request()

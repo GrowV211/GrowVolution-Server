@@ -1,6 +1,8 @@
-import website
 
-website.init_app()
+def updater():
+    import website
 
-from website.temporary import start_updater
-start_updater().join()
+    website.init_app()
+
+    from website.temporary import start_updater
+    start_updater()

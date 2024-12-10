@@ -115,6 +115,23 @@ input:disabled {
     width: 100%;
 }
 
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    appearance: none;
+}
+
+.progress-bar::-webkit-progress-value {
+    background-color: #4caf50;
+    border-radius: 5px;
+}
+
+.progress-bar::-moz-progress-bar {
+    background-color: #4caf50;
+    border-radius: 5px;
+}
+
 .info-container {
     max-width: 750px;
     width: 100%;

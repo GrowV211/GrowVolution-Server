@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const email = document.getElementById("email");
     const e_warn = document.getElementById("email_warning");
 
-    SOCKET.on('availability_response', (data) => {
+    function onAvailabilityResponse(data) {
         if (data.available && data.type === 'email')
             e_warn.style.display = 'block'
 
@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", function () {
             e_warn.style.display = 'none'
             u_warn.style.display = 'none'
         }
-    })
+    }
+
+    availabilityResponseHandler = onAvailabilityResponse
 
     function warn_display(e, type) {
         const value = e.target.value
@@ -23,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (type === 'email' && !value.includes('@'))
             return
 
-        SOCKET.emit('availability_check', {
+        availabilityCheck({
             type: type,
             value: value
         })

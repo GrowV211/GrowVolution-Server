@@ -1,6 +1,6 @@
 from ..conversation.chat import get_chat
 from website.data import User, Socket, mod_messages, admin_messages
-from website.socket import send_update
+from ..socket.manage import send_message
 
 
 def _empty_message_update():
@@ -30,27 +30,27 @@ def update_user_messages(data):
             update['user'] = target_user.username
             update['messages'] = user.get_unread_chat_messages(chat)
             update['last'] = chat.get_last_message_text(user)
-            send_update(socket.id, 'update_messages', update)
+            send_message('update_messages', update, socket.id)
 
         update = _empty_message_update()
         update['messages'] = user.get_unread_messages()
-        send_update(socket.id, 'update_messages', update)
+        send_message('update_messages', update, socket.id)
 
     elif msg_type == 'requests':
-        send_update(socket.id, 'update_messages', {
+        send_message('update_messages', {
             'type': msg_type,
             'messages': user.get_unread_requests()
-        })
+        }, socket.id)
 
 
 def _send_moderation_update(users, msg_type, messages):
     for user in users:
         socket = Socket.query.filter_by(userID=user.id).first()
         if socket:
-            send_update(socket.id, 'update_messages', {
+            send_message('update_messages', {
                 'type': msg_type,
                 'messages': messages
-            })
+            }, socket.id)
 
 
 def update_moderation_messages(data):

@@ -788,7 +788,7 @@ class Socket(DB.Model):
     __tablename__ = 'socket'
 
     id = DB.Column(DB.String(255), primary_key=True)
-    userID = DB.Column(DB.Integer, DB.ForeignKey('account.id'), nullable=False)
+    userID = DB.Column(DB.Integer, DB.ForeignKey('account.id'))
 
     tab = DB.Column(DB.String(64), nullable=False, default='home')
 
@@ -796,7 +796,7 @@ class Socket(DB.Model):
 
     chatroom = DB.relationship('Chatroom', back_populates='socket', cascade="all, delete-orphan" )
 
-    def __init__(self, socket, user):
+    def __init__(self, socket, user=None):
         self.id = socket
         self.userID = user
 
