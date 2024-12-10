@@ -20,4 +20,4 @@ Wenn du mehr über die Vision und die Mission von **GrowVolution** erfahren möc
 ---
 
 ## Lizenz
-Dieses Projekt ist unter der [GNU GPL-Lizenz](LICENSE) lizenziert.
+Dieses Projekt ist mit der [GNU GPL v3.0](LICENSE) lizenziert.
