@@ -1,3 +1,4 @@
+from . import NRS_PASSWORD
 import random
 import smtplib
 import string
@@ -12,7 +13,6 @@ def _nrs():
 
 
 SENDER = "noreply@growvolution.org"
-PASSWD = "!nrs@GrowV211#"
 MAIL_SERVICE = _nrs()
 
 
@@ -34,7 +34,7 @@ def _get_html(content):
 
 def _connect():
     MAIL_SERVICE.starttls()
-    MAIL_SERVICE.login(SENDER, PASSWD)
+    MAIL_SERVICE.login(SENDER, NRS_PASSWORD)
 
 
 def _reconnect():
@@ -94,30 +94,6 @@ def send_reset_link(receiver, user, ):
     send(receiver, "Passwort zurücksetzen", body, "html")
 
     return code
-
-
-def send_reset_info(receiver, user):
-    body = _get_html(f"""
-        Hey {user}!<br><br>Your password has changed now.<br>
-        If you did not perform this action, we highly recommend you to<br>
-        change your password on several platforms, including your email provider.<br><br>
-        If you need further assistance, do not hesitate to <a href="mailto:info@growvolution.org">contact us</a>.
-        <br><br>All the best<br>Your GrowV Team!
-    """)
-
-    send(receiver, "Password changed", body, "html")
-
-
-def send_new_attempt_mail(receiver, user, username):
-    body = _get_html(f"""
-        Hey {user}!<br><br>We recognized a new login attempt.<br>
-        If this was you, you can ignore this email. Otherwise please 
-        <a href="https://growvolution.org/user/{username}/edit">change your password</a>.<br><br>
-        For further assistance, please <a href="mailto:info@growvolution.org">contact us</a>.<br>
-        <br>All the best<br>Your GrowV Team!
-    """)
-
-    send(receiver, "New login attempt", body, "html")
 
 
 def start():

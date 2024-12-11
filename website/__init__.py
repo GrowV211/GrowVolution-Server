@@ -8,17 +8,19 @@ APP = Flask(__name__)
 SOCKET = SocketIO(APP, async_mode='eventlet')
 
 EXEC_MODE = ''
+NRS_PASSWORD = ''
 
 ALL_METHODS = ['GET', 'POST']
 
 
 def init_app():
-    global EXEC_MODE
+    global EXEC_MODE, NRS_PASSWORD
 
     env_path = Path(__file__).resolve().parent.parent / 'server.env'
     load_dotenv(dotenv_path=env_path)
 
     EXEC_MODE = os.getenv('EXEC_MODE')
+    NRS_PASSWORD = os.getenv('NRS_PASSWORD')
 
     APP.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     APP.config['SERVER_NAME'] = os.getenv('SERVER_NAME')
