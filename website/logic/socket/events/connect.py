@@ -11,21 +11,24 @@ def handle_event():
     user = active_user()
 
     if not user:
-        socket = Socket(request.sid)
+        sid = request.sid
+        socket = Socket(sid)
         add_model(socket)
-        log('info', "New socket connection without active user.")
+        log('info', f"Socket connection via '{sid}' without active user.")
 
     else:
         existing = Socket.query.filter_by(userID=user.id).first()
+        sid = request.sid
 
         if existing:
-            update_chatroom(existing.id, request.sid)
-            disconnect(existing.id)
+            e_sid = existing.id
+            update_chatroom(e_sid, sid)
+            disconnect(e_sid)
             delete_model(existing)
-            log('info', "Existing connection updated on reconnect.")
+            log('info', f"User socket connection via '{e_sid}' now via '{sid}'.")
 
-        socket = Socket(request.sid, user.id)
+        socket = Socket(sid, user.id)
         add_model(socket)
-        log('info', "New socket connection with active user.")
+        log('info', f"Socket connection via '{sid}' with active user.")
 
     emit('connect', EXEC_MODE)

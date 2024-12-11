@@ -1,9 +1,12 @@
 from . import EXEC_MODE
 from datetime import datetime
 from pathlib import Path
+import os
 
 LOG_PATH = Path(__file__).resolve().parent / 'logs'
 SESSION_LOG = ''
+
+os.makedirs(LOG_PATH, exist_ok=True)
 
 
 def get_time():

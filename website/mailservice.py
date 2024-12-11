@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 from email.utils import format_datetime
+from .debugger import log
 
 
 def _nrs():
@@ -33,12 +34,16 @@ def _get_html(content):
 
 
 def _connect():
+    log('info', f"Connecting to SMTP server as '{SENDER}'.")
+
     MAIL_SERVICE.starttls()
     MAIL_SERVICE.login(SENDER, NRS_PASSWORD)
 
 
 def _reconnect():
     global MAIL_SERVICE
+
+    log('info', "Restarting noreply mail service.")
 
     MAIL_SERVICE.close()
     MAIL_SERVICE = _nrs()
@@ -60,10 +65,13 @@ def send(receiver, subject, body, c_type):
     msg.attach(MIMEText(body, c_type))
 
     try:
+        log('info', f"Sending email to '{receiver}'.")
         MAIL_SERVICE.sendmail(SENDER, receiver, msg.as_string())
     except smtplib.SMTPSenderRefused:
+        log('warn', "SMTPSenderRefused - starting resend attempt.")
         _resend(receiver, subject, body, c_type)
     except smtplib.SMTPServerDisconnected:
+        log('warn', "SMTPServerDisconnected - starting resend attempt.")
         _resend(receiver, subject, body, c_type)
 
 

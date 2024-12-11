@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
 from pathlib import Path
@@ -7,10 +7,23 @@ import os
 APP = Flask(__name__)
 SOCKET = SocketIO(APP, async_mode='eventlet')
 
+SERVER_DOMAIN = 'https://growvolution.org'
+
 EXEC_MODE = ''
 NRS_PASSWORD = ''
 
 ALL_METHODS = ['GET', 'POST']
+
+
+@APP.before_request
+def log_request():
+    from .debugger import log
+    ip = request.remote_addr
+    method = request.method
+    url = request.url
+    user_agent = request.headers.get('User-Agent')
+
+    log(f'{method}', f"{ip} requested {url.removeprefix(SERVER_DOMAIN)} [{user_agent}].")
 
 
 def init_app():

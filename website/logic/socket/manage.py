@@ -1,6 +1,7 @@
 from flask import request
 from flask_socketio import emit
-from website.data import Socket, Chatroom, add_model, delete_model
+from ...data import Socket, Chatroom, add_model, delete_model
+from ...debugger import log
 
 
 
@@ -25,6 +26,7 @@ def send_message(key, value, socket_id=None):
 def join_chatroom(chat):
     chatroom = Chatroom(request.sid, chat)
     add_model(chatroom)
+    log('info', f"Chatroom {chatroom.id} for {chat.id} created.")
 
 
 def update_chatroom(previous_sid, new_sid):
