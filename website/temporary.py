@@ -2,6 +2,7 @@ import time
 import threading
 import random
 from . import APP
+from .debugger import log
 from .logic.updating import user
 from datetime import datetime, timedelta
 
@@ -102,27 +103,20 @@ def _remaining_seconds():
 def _updater():
     timer = _remaining_seconds()
     date = datetime.now().date()
-    date_strf = date.strftime('%d.%m.%Y')
 
-    print(f"[{date_strf}] Updater started.")
-    print(f"[{date_strf}] Next update in {timer} seconds.")
+    log('info', f"Database updater started, next update in {timer} seconds.")
 
     while True:
-        timer -= 1
-        time.sleep(1)
+        time.sleep(timer)
 
-        if timer <= 0:
-            print(f"[{date_strf}] Updating database.")
+        log('info', "Updating database.")
 
-            with APP.app_context():
-                user.update(date)
+        with APP.app_context():
+            user.update(date)
 
-            timer = _calc_seconds(ONE_DAY)
-            date += timedelta(days=1)
-            date_strf = date.strftime('%d.%m.%Y')
+        timer = _calc_seconds(ONE_DAY)
+        date += timedelta(days=1)
 
 
 def start_updater():
-    thread = threading.Thread(target=_updater)
-    thread.start()
-    return thread
+    threading.Thread(target=_updater).start()

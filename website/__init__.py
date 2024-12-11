@@ -7,12 +7,18 @@ import os
 APP = Flask(__name__)
 SOCKET = SocketIO(APP, async_mode='eventlet')
 
+EXEC_MODE = ''
+
 ALL_METHODS = ['GET', 'POST']
 
 
 def init_app():
+    global EXEC_MODE
+
     env_path = Path(__file__).resolve().parent.parent / 'server.env'
     load_dotenv(dotenv_path=env_path)
+
+    EXEC_MODE = os.getenv('EXEC_MODE')
 
     APP.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     APP.config['SERVER_NAME'] = os.getenv('SERVER_NAME')
@@ -26,9 +32,11 @@ def init_app():
 
     from .logic import socket
 
+    from .debugger import start_session
+    start_session()
+
     from .mailservice import start
     start()
 
-    if os.getenv('EXEC_MODE') != 'DEBUG':
-        from .temporary import start_updater
-        start_updater()
+    from .temporary import start_updater
+    start_updater()

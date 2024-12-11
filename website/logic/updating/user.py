@@ -1,3 +1,4 @@
+from website.debugger import log
 from website.data import User
 
 
@@ -8,4 +9,4 @@ def update(date):
         if not user.has_done_journal(date):
             user.update_score(-10)
 
-    print(f"[{date.strftime('%d.%m.%Y')}] All users updated.")
+    log('info', "All users updated.")

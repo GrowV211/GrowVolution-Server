@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    SOCKET.on('connect', () => {
-        console.log("Socket connected: ", SOCKET.connected)
+    SOCKET.on('connect', (exec_mode) => {
+        EXEC_MODE = exec_mode
+        log('info', "Socket connected.")
     })
 
     SOCKET.on('update_messages', updateMessages)
@@ -34,6 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     SOCKET.on('disconnect', () => {
-        console.warn("Socket disconnected... reconnecting.")
+        log('warning', "Socket disconnected... reconnecting.")
     })
 })

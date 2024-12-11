@@ -1,9 +1,10 @@
 from flask import request
-from flask_socketio import disconnect
+from flask_socketio import disconnect, emit
+from website import EXEC_MODE
+from website.debugger import log
 from website.data import Socket, add_model, delete_model
 from ..manage import update_chatroom
 from ...auth.verify import active_user
-from datetime import datetime
 
 
 def handle_event():
@@ -12,8 +13,7 @@ def handle_event():
     if not user:
         socket = Socket(request.sid)
         add_model(socket)
-        print(
-            f"127.0.0.1 - - [{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] New Socket established without active user.")
+        log('info', "New socket connection without active user.")
 
     else:
         existing = Socket.query.filter_by(userID=user.id).first()
@@ -22,10 +22,10 @@ def handle_event():
             update_chatroom(existing.id, request.sid)
             disconnect(existing.id)
             delete_model(existing)
-            print(
-                f"127.0.0.1 - - [{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] Closed connection to existing socket.")
+            log('info', "Existing connection updated on reconnect.")
 
         socket = Socket(request.sid, user.id)
         add_model(socket)
-        print(
-            f"127.0.0.1 - - [{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] New Socket established with active user.")
+        log('info', "New socket connection with active user.")
+
+    emit('connect', EXEC_MODE)
