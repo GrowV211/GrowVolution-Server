@@ -1,6 +1,6 @@
 *.env
 /.idea/
-/website/static/img/
+/website/static/img/usr/
 /website/static/proof/
 /website/logs/
 __pychache__/
