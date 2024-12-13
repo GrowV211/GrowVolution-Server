@@ -26,7 +26,7 @@ def send_message(key, value, socket_id=None):
 def join_chatroom(chat):
     chatroom = Chatroom(request.sid, chat)
     add_model(chatroom)
-    log('info', f"Chatroom {chatroom.id} for {chat.id} created.")
+    log('info', f"Chatroom created for {chat}.")
 
 
 def update_chatroom(previous_sid, new_sid):

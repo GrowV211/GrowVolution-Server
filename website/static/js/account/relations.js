@@ -20,15 +20,17 @@ function init() {
         })
     }
 
-    function updateContainer(request, user=null) {
-        fetch(window.location, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: request, container: current, receiver: user})
-        }).then(res => res.text()).then(html => {
-            container.innerHTML = html
+    function onRelationUpdate(html) {
+        container.innerHTML = html
+        initContainer()
+    }
+    relationUpdateEventHandler = onRelationUpdate
 
-            initContainer()
+    function updateContainer(request, user=null) {
+        relationInteraction({
+            value: request,
+            container: current,
+            receiver: user
         })
     }
 

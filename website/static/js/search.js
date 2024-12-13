@@ -23,26 +23,29 @@ function init() {
         }
     }
 
+    function onRelationUpdate() {
+        updateContainer(search.value)
+    }
+    relationUpdateEventHandler = onRelationUpdate
+
     function updateRelation(request, user) {
-        fetch("/relations", {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: request, receiver: user, breakpoint: true })
-        }).then(res => {
-            if (res.ok) {
-                updateContainer(search.value)
-            }
+        relationInteraction({
+            value: request,
+            receiver: user,
+            breakpoint: true
         })
     }
 
+    function onSearchResponse(html) {
+        container.innerHTML = html
+        initContainer()
+    }
+    searchResponseEventHandler = onSearchResponse
+
     function updateContainer(request) {
-        fetch(window.location, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({value: request, database: current })
-        }).then(res => res.text()).then(html => {
-            container.innerHTML = html
-            initContainer()
+        searchRequest({
+            value: request,
+            database: current
         })
     }
 

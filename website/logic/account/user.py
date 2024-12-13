@@ -83,7 +83,7 @@ def handle_interaction(user, current, data):
 
     elif not current:
         from .relation import handle_relation
-        return handle_relation(user, value)
+        return handle_relation(user, value, None, True)
 
     else:
         timestamp = False

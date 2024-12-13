@@ -5,3 +5,5 @@ let chatMessageEventHandler
 let profileEditEventHandler
 let editResetEventHandler
 let deletePPEventHandler
+let relationUpdateEventHandler
+let searchResponseEventHandler

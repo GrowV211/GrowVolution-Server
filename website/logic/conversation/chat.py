@@ -1,7 +1,5 @@
 from website.basic import render
-from website.data import User, Chat, Chatroom, add_model, delete_model
-from website.logic.account.user import user_attributes
-from website.logic.auth.verify import active_user
+from website.data import Chat, add_model, delete_model
 from markupsafe import Markup
 
 

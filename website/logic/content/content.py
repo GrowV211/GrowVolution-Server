@@ -34,8 +34,7 @@ def render_create_view():
     return render('basic/content/create.html')
 
 
-def _handle_fetch():
-    data = request.get_json()
+def handle_content_interaction(data):
     value = data.get('value')
     post = Content.query.filter_by(id=int(data.get('id'))).first()
 
@@ -71,9 +70,6 @@ def handle_request():
 
     if not user:
         return goto_login(), 500
-
-    if request.is_json:
-        return _handle_fetch()
 
     if request.method == "POST":
         new_post = Content(user.id, request.form['headline'], request.form['body'], request.form['category'])

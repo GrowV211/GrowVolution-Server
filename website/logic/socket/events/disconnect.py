@@ -6,6 +6,6 @@ from ....debugger import log
 
 def handle_event():
     sid = request.sid
-    socket = get_socket()
+    socket = get_socket(sid)
     delete_model(socket)
     log('info', f"Socket connection via '{sid}' now disconnected.")

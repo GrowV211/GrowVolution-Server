@@ -3,6 +3,8 @@ from .events import (connect, disconnect, back, set_tab,
                      join_chatroom, availability_check, forgot_query,
                      chat_message, resend_mail, profile_interaction)
 from ..account.edit import handle_edit, handle_reset_request, handle_delete
+from ..search import handle_search
+from ..content.content import handle_content_interaction
 from .manage import send_message
 
 
@@ -24,6 +26,11 @@ def on_back():
 @SOCKET.on('set_tab')
 def on_set_tab(tab):
     set_tab.handle_event(tab)
+
+
+@SOCKET.on('search')
+def on_search(data):
+    send_message('search_response', handle_search(data))
 
 
 @SOCKET.on('availability_check')
@@ -61,6 +68,12 @@ def on_pp_delete():
     send_message('pp_delete', handle_delete())
 
 
+@SOCKET.on('relation_interaction')
+def on_relation_interaction(data):
+    from ..account.relation import handle_interaction
+    send_message('relation_update', handle_interaction(data))
+
+
 @SOCKET.on('join_chatroom')
 def on_join_chatroom(username):
     join_chatroom.handle_event(username)
@@ -69,3 +82,9 @@ def on_join_chatroom(username):
 @SOCKET.on('chat_message')
 def on_chat_message(data):
     chat_message.handle_event(data)
+
+
+@SOCKET.on('content_interaction')
+def on_content_interaction(data):
+    send_message('content_interaction_response', handle_content_interaction(data))
+

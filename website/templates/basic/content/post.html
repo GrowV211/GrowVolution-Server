@@ -146,11 +146,7 @@
             }
 
             function updatePost(command, headline=null, content=null) {
-                fetch("/content/update", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({id: post.id, value: command, headline: headline, content: content})
-                }).then(res => res.text()).then(html => {
+                updateEventHandler = (html) => {
                     if (command === "edit") {
                         container.innerHTML = html
 
@@ -160,6 +156,13 @@
                     } else if (command === "delete") {
                         back()
                     }
+                }
+
+                contentInteraction({
+                    id: post.id,
+                    value: command,
+                    headline: headline,
+                    content: content
                 })
             }
 

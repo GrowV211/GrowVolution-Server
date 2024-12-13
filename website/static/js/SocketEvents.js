@@ -14,12 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
         profileEditEventHandler(data)
     })
 
+    SOCKET.on('search_response', (html) => {
+        searchResponseEventHandler(html)
+    })
+
     SOCKET.on('edit_reset', (data) => {
         editResetEventHandler(data)
     })
 
     SOCKET.on('pp_delete', (html) => {
         deletePPEventHandler(html)
+    })
+
+    SOCKET.on('relation_update', (data) => {
+        relationUpdateEventHandler(data)
     })
 
     SOCKET.on('update_chat', (data) => {

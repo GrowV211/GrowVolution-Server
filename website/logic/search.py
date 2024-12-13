@@ -1,13 +1,13 @@
-from flask import request
 from website.basic import render
 from website.data import User
-from website.logic.account.relation import relation_attributes
 from website.logic.account.user import user_attributes
 from website.logic.auth.verify import active_user
 from markupsafe import Markup
 
 
 def _get_users_html(users, ui_user):
+    from website.logic.account.relation import relation_attributes
+
     user_list = ""
     count = 0
 
@@ -27,15 +27,13 @@ def _get_users_html(users, ui_user):
     return Markup(user_list)
 
 
-def _handle_fetch():
+def handle_search(data):
     user = active_user()
-
-    data = request.get_json()
     value = data.get('value')
     db = data.get('database')
 
     if db == 'users':
-        users = User.query.filter(User.username.like(f"%{value}%"))
+        users = User.query.filter(User.username.like(f"%{value}%")).order_by(User.score.desc()).all()
         return _get_users_html(users, user)
 
     return ''
@@ -43,8 +41,4 @@ def _handle_fetch():
 
 
 def handle_request():
-
-    if request.is_json:
-        return _handle_fetch()
-
     return render('basic/search.html')

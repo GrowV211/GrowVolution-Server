@@ -10,6 +10,8 @@ def render(template, **kwargs):
     unread_messages = user.get_unread_messages() if user else None
     unread_requests = user.get_unread_requests() if user else None
 
+    journal_time = user.journal_time() if user else None
+
     mod_msgs = mod_messages() if user and (user.is_admin() or user.is_mod()) else None
     admin_msgs = admin_messages() if user and user.is_admin() else None
 
@@ -17,6 +19,7 @@ def render(template, **kwargs):
                            role=user.role if user else None,
                            unread_messages=unread_messages,
                            unread_requests=unread_requests,
+                           journal_time=journal_time,
                            mod_messages=mod_msgs,
                            admin_messages=admin_msgs, **kwargs)
 

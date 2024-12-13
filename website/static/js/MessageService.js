@@ -9,6 +9,8 @@ function updateMessages(data) {
     const requestsText = document.getElementById("requests_text")
 
     if (messages) {
+        flash(`Du hast neue Benachrichtigungen!`, 'warning')
+
         element.style.display = "block"
 
         if (type !== "mod_msgs" && type !== "admin_msgs")
@@ -25,7 +27,9 @@ function updateMessages(data) {
     } else {
         element.style.display = "none"
 
-        if (requestsText && type === "requests")
+        if (requestsText && type === "requests") {
             requestsText.style.marginLeft = "0"
+            document.getElementById("relationRequests").style.display = "none"
+        }
     }
 }

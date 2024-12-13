@@ -1,8 +1,8 @@
-from flask import request
 from website.basic import render, goto_login
 from website.data import Request, add_model, delete_model, User
 from website.logic.auth.verify import active_user
 from .user import render_profile, user_attributes
+from ..updating.messages import update_user_messages
 from markupsafe import Markup
 
 
@@ -44,7 +44,7 @@ def relation_attributes(ui_user, profile_user):
     }
 
 
-def handle_relation(receiver, value, profile=True):
+def handle_relation(receiver, value, data, profile=False):
     requestor = active_user()
 
     if value == 'add':
@@ -70,13 +70,22 @@ def handle_relation(receiver, value, profile=True):
         from website.logic.conversation.chat import delete_chat
         delete_chat(requestor, receiver)
 
+    update_user_messages({
+        'user': receiver.username,
+        'type': 'requests',
+    })
+    update_user_messages({
+        'user': requestor.username,
+        'type': 'requests',
+    })
+
     if profile:
         return render_profile(receiver, True, False)
-    else:
-        if request.get_json().get('breakpoint'):
-            return '', 200
+    elif data.get('breakpoint'):
+        return '', 200
 
-        return _handle_fetch(requestor, request.get_json().get('container'))
+    data['value'] = data.get('container')
+    return handle_interaction(data)
 
 
 def _get_relations_html(user):
@@ -115,7 +124,9 @@ def _get_pending_html(user):
     return Markup(requests)
 
 
-def _handle_fetch(user, value):
+def handle_interaction(data):
+    user = active_user()
+    value = data.get('value')
 
     if value == 'active':
         return _get_relations_html(user)
@@ -127,9 +138,8 @@ def _handle_fetch(user, value):
         return _get_pending_html(user)
 
     else:
-        receiver = User.query.filter_by(username=request.get_json().get('receiver')).first()
-        return handle_relation(receiver, value, False)
-
+        receiver = User.query.filter_by(username=data.get('receiver')).first()
+        return handle_relation(receiver, value, data)
 
 
 def handle_request():
@@ -137,9 +147,6 @@ def handle_request():
 
     if not user:
         return goto_login()
-
-    if request.is_json:
-        return _handle_fetch(user, request.get_json().get('value'))
 
     return render('basic/account/relation/relations.html',
                   relations=_get_relations_html(user))
