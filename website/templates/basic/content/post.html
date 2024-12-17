@@ -134,17 +134,6 @@
         })
 
         nav.querySelectorAll(".bi").forEach(btn => {
-            function back() {
-                fetch(window.location, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({value: 'profile'})
-                }).then(res => res.text()).then(html => {
-                    container.innerHTML = html
-                    init()
-                })
-            }
-
             function updatePost(command, headline=null, content=null) {
                 updateEventHandler = (html) => {
                     if (command === "edit") {
@@ -205,6 +194,12 @@
             }
         })
     }
+
+    function onUpdateEvent(html) {
+        container.innerHTML = html
+        init()
+    }
+    updateEventHandler = onUpdateEvent
 
     function addComment() {
         if (commentView.value.length > 1) {

@@ -4,6 +4,11 @@ from website.data import User, add_model
 from website.mailservice import send_confirm_mail
 from website.temporary import lifecycle, new_process, TEN_MINUTES, CONFIRM
 import random
+import requests
+import os
+
+SITE_KEY = os.getenv('SITE_KEY')
+API_KEY = os.getenv('API_KEY')
 
 
 def _confirm(model):
@@ -42,6 +47,19 @@ def handle_request():
 
     if request.method == "POST":
 
+        recaptcha_response = request.form.get('g-recaptcha-response')
+
+        verification_url = "https://www.google.com/recaptcha/api/siteverify"
+        data = {
+            'secret': API_KEY,
+            'response': recaptcha_response
+        }
+        response = requests.post(verification_url, data=data)
+        result = response.json()
+
+        if not result.get("success"):
+            return render_with_flash(template, "Deine reCAPTCHA konnte nicht bestätigt werden!", 'danger', site_key=SITE_KEY)
+
         psw = request.form.get('psw')
 
         if not psw:
@@ -61,4 +79,4 @@ def handle_request():
         return redirect(f'/notice/{pid}')
 
     else:
-        return render('auth/signup.html')
+        return render('auth/signup.html', site_key=SITE_KEY)
