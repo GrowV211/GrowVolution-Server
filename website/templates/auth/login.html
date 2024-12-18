@@ -1,8 +1,12 @@
 {% extends "auth/base.html" %}
 {% block title %}Einloggen{% endblock %}
 {% block script %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
     <script src="{{ url_for('static', filename='js/auth/base.js') }}"></script>
 {% endblock %}
 {% block form_content %}
     {% include "auth/login_form.html" %}
+{% endblock %}
+{% block captcha %}
+    {% include "auth/recaptcha_script.html" %}
 {% endblock %}

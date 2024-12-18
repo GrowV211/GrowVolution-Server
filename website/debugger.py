@@ -1,4 +1,4 @@
-from . import EXEC_MODE
+from . import APP
 from datetime import datetime
 from pathlib import Path
 import os
@@ -16,7 +16,7 @@ def get_time():
 def log(category, message):
     log_str = f"[{get_time()}] [{category.upper()}] {message}"
 
-    if EXEC_MODE == 'DEBUG':
+    if APP.config['EXEC_MODE'] == 'DEBUG':
         print(log_str)
 
     write_log(f'{log_str}\n')
@@ -32,5 +32,5 @@ def start_session():
 
     SESSION_LOG = f'SESSION-{datetime.now().strftime("%Y%m%d%H%M%S")}.log'
 
-    log('info', 'Logging started.')
-    log('info', f'Server is now running in {EXEC_MODE} mode.')
+    log('info', "Logging started.")
+    log('info', f"Server is now running in {APP.config['EXEC_MODE']} mode.")

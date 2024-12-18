@@ -3,17 +3,18 @@
   <link href="{{ url_for('static', filename='css/auth.css') }}" rel="stylesheet">
 {% endblock %}
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
-  <div class="auth-container bg-white rounded shadow-sm">
-    <div class="d-flex align-items-center justify-content-center headline pb-2 mt-2">
-      <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="Logo" class="logo" />
-      <h1 class="h5 mb-0 ms-3 fw-bold">GrowVolution</h1>
-    </div>
-    <form id="auth" method="post" class="p-3">
-      {% block form_content %}
+    <div class="d-flex justify-content-center align-items-center vh-100">
+      <div class="auth-container bg-white rounded shadow-sm">
+        <div class="d-flex align-items-center justify-content-center headline pb-2 mt-2">
+          <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="Logo" class="logo" />
+          <h1 class="h5 mb-0 ms-3 fw-bold">GrowVolution</h1>
+        </div>
+        <form id="auth" method="post" class="p-3">
+          {% block form_content %}
 
-      {% endblock %}
-    </form>
-  </div>
-</div>
+          {% endblock %}
+        </form>
+      </div>
+    </div>
+    {% block captcha %}{% endblock %}
 {% endblock %}

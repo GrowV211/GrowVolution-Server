@@ -1,6 +1,6 @@
 from flask import request
 from flask_socketio import disconnect, emit
-from website import EXEC_MODE
+from website import APP
 from website.debugger import log
 from website.data import Socket, add_model, delete_model
 from ..manage import update_chatroom
@@ -31,4 +31,4 @@ def handle_event():
         add_model(socket)
         log('info', f"Socket connection via '{sid}' with active user.")
 
-    emit('connect', EXEC_MODE)
+    emit('connect', APP.config['EXEC_MODE'])

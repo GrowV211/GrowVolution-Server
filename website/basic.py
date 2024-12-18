@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect
 from markupsafe import Markup
 from .data import mod_messages, admin_messages
 from .logic.auth.verify import active_user
+from . import APP
 
 
 def render(template, **kwargs):
@@ -21,7 +22,8 @@ def render(template, **kwargs):
                            unread_requests=unread_requests,
                            journal_time=journal_time,
                            mod_messages=mod_msgs,
-                           admin_messages=admin_msgs, **kwargs)
+                           admin_messages=admin_msgs,
+                           site_key=APP.config['CAPTCHA_KEY'], **kwargs)
 
 
 def render_404():

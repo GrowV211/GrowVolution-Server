@@ -9,9 +9,6 @@ SOCKET = SocketIO(APP, async_mode='eventlet')
 
 SERVER_DOMAIN = 'https://growvolution.org'
 
-EXEC_MODE = ''
-NRS_PASSWORD = ''
-
 ALL_METHODS = ['GET', 'POST']
 
 
@@ -26,17 +23,18 @@ def log_request():
 
 
 def init_app():
-    global EXEC_MODE, NRS_PASSWORD
 
     env_path = Path(__file__).resolve().parent.parent / 'server.env'
     load_dotenv(dotenv_path=env_path)
 
-    EXEC_MODE = os.getenv('EXEC_MODE')
-    NRS_PASSWORD = os.getenv('NRS_PASSWORD')
+    APP.config['EXEC_MODE'] = os.getenv('EXEC_MODE')
+    APP.config['NRS_PASSWORD'] = os.getenv('NRS_PASSWORD')
 
     APP.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     APP.config['SERVER_NAME'] = os.getenv('SERVER_NAME')
     APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+    APP.config['CAPTCHA_KEY'] = os.getenv('SITE_KEY')
 
     from .views import views
     from .auth import auth

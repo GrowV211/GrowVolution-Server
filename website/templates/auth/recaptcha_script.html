@@ -1,0 +1,17 @@
+<script id="recaptcha">
+    const form = document.getElementById("auth")
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault()
+
+        grecaptcha.execute('{{ site_key }}', { action: 'submit' }).then(function (token) {
+            const recaptchaInput = document.createElement('input');
+            recaptchaInput.type = 'hidden';
+            recaptchaInput.name = 'g-recaptcha-response';
+            recaptchaInput.value = token;
+
+            form.appendChild(recaptchaInput);
+            form.submit();
+        });
+    })
+</script>

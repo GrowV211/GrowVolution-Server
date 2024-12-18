@@ -5,6 +5,7 @@ function init() {
     const show_hide_btn = document.getElementById("show_hide");
     const password = document.getElementById("pass");
     const help = document.getElementById("help")
+    const captchaScript = document.getElementById("recaptcha")
 
     function onUpdateEvent(data) {
         const value = data.value
@@ -42,6 +43,10 @@ function init() {
         help.addEventListener("click", () => {
             forgotQuery({ value: 'forgot' })
         })
+    }
+
+    if (captchaScript) {
+        eval(captchaScript.innerText)
     }
 }
 

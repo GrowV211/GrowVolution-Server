@@ -1,4 +1,4 @@
-from . import NRS_PASSWORD
+from . import APP
 import random
 import smtplib
 import string
@@ -37,7 +37,7 @@ def _connect():
     log('info', f"Connecting to SMTP server as '{SENDER}'.")
 
     MAIL_SERVICE.starttls()
-    MAIL_SERVICE.login(SENDER, NRS_PASSWORD)
+    MAIL_SERVICE.login(SENDER, APP.config['NRS_PASSWORD'])
 
 
 def _reconnect():
