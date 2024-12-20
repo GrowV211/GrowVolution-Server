@@ -1,25 +1,15 @@
-from flask import Flask, request
+from flask import Flask
 from flask_socketio import SocketIO
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 from pathlib import Path
 import os
 
 APP = Flask(__name__)
 SOCKET = SocketIO(APP, async_mode='eventlet')
-
-SERVER_DOMAIN = 'https://growvolution.org'
+APP.wsgi_app = ProxyFix(APP.wsgi_app, x_for=1, x_proto=1)
 
 ALL_METHODS = ['GET', 'POST']
-
-
-@APP.before_request
-def log_request():
-    from .debugger import log
-    method = request.method
-    url = request.url
-    user_agent = request.headers.get('User-Agent')
-
-    log(f'{method}', f"{url.removeprefix(SERVER_DOMAIN)} [{user_agent}]")
 
 
 def init_app():

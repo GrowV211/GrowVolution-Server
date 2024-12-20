@@ -6,15 +6,12 @@ from ...auth.verify import active_user
 from ...conversation import chats
 from ...account.user import render_profile
 from markupsafe import Markup
-from ....debugger import log
 
 
 def handle_event():
     sid = request.sid
     socket = get_socket(sid)
     socket_tab = socket.tab
-
-    log('info', f"Back navigation via '{sid}' at '{socket_tab}'.")
 
     if socket_tab == 'home':
         pass
@@ -39,5 +36,3 @@ def handle_event():
         if user:
             leave_chatroom()
             send_message('update', Markup(render_profile(user, True, user == active_user())))
-
-    log('info', "Update response sent.")

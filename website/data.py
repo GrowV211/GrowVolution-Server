@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from markupsafe import Markup
 import re
+import os
 
 DB = SQLAlchemy(APP)
 CRYPT = Bcrypt(APP)
@@ -93,6 +94,8 @@ class User(DB.Model):
     username = DB.Column(DB.String(35), nullable=False, unique=True)
     email = DB.Column(DB.String(60), nullable=False, unique=True)
     psw_crypt = DB.Column(DB.String(256), nullable=False)
+    salt = DB.Column(DB.LargeBinary(16), nullable=False)
+
     info = DB.Column(DB.String(500), nullable=True)
     img = DB.Column(DB.String(39), nullable=True)
     alt_bg = DB.Column(DB.String(7), nullable=False)
@@ -134,7 +137,10 @@ class User(DB.Model):
         self.last = last
         self.username = username
         self.email = email
+
         self.psw_crypt = CRYPT.generate_password_hash(password).decode()
+        self.salt = os.urandom(16)
+
         self.img = None
         self.alt_bg = alt_bg
 
@@ -307,11 +313,15 @@ class User(DB.Model):
 class Chat(DB.Model):
     __tablename__ = 'chat'
     id = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
+    salt = DB.Column(DB.LargeBinary(16), nullable=False)
 
     participants = DB.relationship('User', secondary=CHATS, back_populates='chats')
     messages = DB.relationship('Message', back_populates='chat', cascade='all, delete-orphan')
 
     chatroom = DB.relationship('Chatroom', back_populates='chat')
+
+    def __init__(self):
+        self.salt = os.urandom(16)
 
     def _get_last_message_data(self, user):
         if self.messages:
@@ -346,7 +356,7 @@ class Message(DB.Model):
     senderID = DB.Column(DB.Integer, DB.ForeignKey('account.id'), nullable=False)
     chatID = DB.Column(DB.Integer, DB.ForeignKey('chat.id'), nullable=False)
 
-    content = DB.Column(DB.String(5120), nullable=False)
+    content = DB.Column(DB.String, nullable=False)
     timestamp = DB.Column(DB.TIMESTAMP, server_default=DB.func.current_timestamp(), nullable=False)
     is_read = DB.Column(DB.Boolean, nullable=False, default=False)
 

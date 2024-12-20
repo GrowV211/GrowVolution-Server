@@ -1,4 +1,4 @@
-from website import SOCKET
+from ...logging import S_EVENTS
 from .events import (connect, disconnect, back, set_tab,
                      join_chatroom, availability_check, forgot_query,
                      chat_message, resend_mail, profile_interaction)
@@ -8,83 +8,83 @@ from ..content.content import handle_content_interaction
 from .manage import send_message
 
 
-@SOCKET.on('connect')
+@S_EVENTS.on('connect')
 def on_connect():
     connect.handle_event()
 
 
-@SOCKET.on('disconnect')
+@S_EVENTS.on('disconnect')
 def on_disconnect():
     disconnect.handle_event()
 
 
-@SOCKET.on('back')
+@S_EVENTS.on('back')
 def on_back():
     back.handle_event()
 
 
-@SOCKET.on('set_tab')
+@S_EVENTS.on('set_tab')
 def on_set_tab(tab):
     set_tab.handle_event(tab)
 
 
-@SOCKET.on('search')
+@S_EVENTS.on('search')
 def on_search(data):
     send_message('search_response', handle_search(data))
 
 
-@SOCKET.on('availability_check')
+@S_EVENTS.on('availability_check')
 def on_availability_check(data):
     availability_check.handle_event(data)
 
 
-@SOCKET.on('forgot_query')
+@S_EVENTS.on('forgot_query')
 def on_forgot_query(data):
     forgot_query.handle_event(data)
 
 
-@SOCKET.on('resend_mail')
+@S_EVENTS.on('resend_mail')
 def on_resend(pid):
     resend_mail.handle_event(pid)
 
 
-@SOCKET.on('profile_interaction')
+@S_EVENTS.on('profile_interaction')
 def on_profile_interaction(data):
     profile_interaction.handle_event(data)
 
 
-@SOCKET.on('edit_profile')
+@S_EVENTS.on('edit_profile')
 def on_edit_profile(data):
     send_message('profile_update', handle_edit(data))
 
 
-@SOCKET.on('reset_edit')
+@S_EVENTS.on('reset_edit')
 def on_reset_edit():
     send_message('edit_reset', handle_reset_request())
 
 
-@SOCKET.on('delete_pp')
+@S_EVENTS.on('delete_pp')
 def on_pp_delete():
     send_message('pp_delete', handle_delete())
 
 
-@SOCKET.on('relation_interaction')
+@S_EVENTS.on('relation_interaction')
 def on_relation_interaction(data):
     from ..account.relation import handle_interaction
     send_message('relation_update', handle_interaction(data))
 
 
-@SOCKET.on('join_chatroom')
+@S_EVENTS.on('join_chatroom')
 def on_join_chatroom(username):
     join_chatroom.handle_event(username)
 
 
-@SOCKET.on('chat_message')
+@S_EVENTS.on('chat_message')
 def on_chat_message(data):
     chat_message.handle_event(data)
 
 
-@SOCKET.on('content_interaction')
+@S_EVENTS.on('content_interaction')
 def on_content_interaction(data):
     send_message('content_interaction_response', handle_content_interaction(data))
 

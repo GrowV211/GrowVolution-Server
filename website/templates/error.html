@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Interner Fehler{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/redirect.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="container align-items-center text-justify not-found mt-5">
+        <h1 class="mb-3">Da ist wohl was schief gelaufen...</h1>
+        <p>
+            Hey mein Lieber, wir entschuldigen uns für die Unannehmlichkeiten!
+            Wie du sicher weißt, bauen wir diese Seite gerade noch auf. Daher kann es hier
+            und da noch zu Problemen kommen. Wenn du das hier siehst, dann melde diesen Fehler
+            gerne. Falls du dich hier aktiver beteiligen möchtest - egal ob mit kreativen Vorschlägen
+            und Ideen oder sogar mit Codeoptimierungen - dann schau dir unser Projekt gerne einmal auf
+            <a href="https://github.com/GrowV211/GrowVolution-Server">Github</a> an. Dort findest du auch
+            einen Discord Server für den aktiven Austausch. Wir freuen uns auf deine Unterstützung!<br><br>
+
+            Wie dem auch sei, um dir das Leben einfacher zu machen, werden wir dich
+            in <span id="time">16</span> Sekunden automatisch auf unsere Homepage weiterleiten.
+        </p>
+    </div>
+{% endblock %}

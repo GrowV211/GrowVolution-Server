@@ -16,15 +16,18 @@ def handle_request(data, socket):
     message = Message(sender.id, content, chat.id)
     add_model(message)
 
-    chatrooms = Chatroom.query.filter_by(chatID=chat.id).all()
+    chatroom = Chatroom.query.filter(
+        Chatroom.chatID == chat.id,
+        Chatroom.socketID != socket
+    ).first()
     updated = False
 
-    for chatroom in chatrooms:
-        if chatroom.socketID != socket:
-            from ..socket.manage import send_message
-            send_message('update_chat', Markup(render_message('received', message)), chatroom.socketID)
-            message.set_read()
-            updated = True
+    if chatroom:
+        from ..socket.manage import send_message
+        send_message('update_chat', Markup(render_message('received', message)), chatroom.socketID)
+        message.set_read()
+        updated = True
+
 
     if not updated:
         from ..updating.messages import update_user_messages

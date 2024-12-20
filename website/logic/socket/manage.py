@@ -1,8 +1,7 @@
+from ... import SOCKET
 from flask import request
-from flask_socketio import emit
 from ...data import Socket, Chatroom, add_model, delete_model
 from ...debugger import log
-
 
 
 def get_socket(socket_id=None, user_id=None):
@@ -17,14 +16,14 @@ def get_socket(socket_id=None, user_id=None):
 
 def send_message(key, value, socket_id=None):
     if socket_id:
-        emit(key, value, to=socket_id)
+        SOCKET.emit(key, value, to=socket_id)
 
     else:
-        emit(key, value)
+        SOCKET.emit(key, value)
 
 
 def join_chatroom(chat):
-    chatroom = Chatroom(request.sid, chat)
+    chatroom = Chatroom(request.sid, chat.id)
     add_model(chatroom)
     log('info', f"Chatroom created for {chat}.")
 

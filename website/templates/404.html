@@ -1,21 +1,7 @@
 {% extends "base.html" %}
 {% block title %}404 - Not found{% endblock %}
 {% block script %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const timeElement = document.getElementById("time");
-            let countdown = parseInt(timeElement.textContent);
-
-            const interval = setInterval(function () {
-                countdown--;
-                timeElement.textContent = countdown.toString();
-                if(countdown <= 0) {
-                    clearInterval(interval);
-                    window.location.replace("https://growvolution.org/");
-                }
-            }, 1000);
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/redirect.js') }}"></script>
 {% endblock %}
 {% block content %}
     <div class="container align-items-center text-justify not-found mt-5">
@@ -24,6 +10,7 @@
             Hey mein Lieber, es ist schön dich hier zu sehen!
             Leider konnten wir für diese Adresse keine passende Seite finden...
             Vielleicht ist sie abgelaufen, wurde verschoben oder existiert gar nicht.<br><br>
+
             Wie dem auch sei, um dir das Leben einfacher zu machen, werden wir dich
             in <span id="time">6</span> Sekunden automatisch auf unsere Homepage weiterleiten.
         </p>

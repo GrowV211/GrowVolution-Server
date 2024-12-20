@@ -20,12 +20,12 @@
         <script src="{{ url_for('static', filename='js/base.js') }}"></script>
         <script src="{{ url_for('static', filename='js/NavUpdater.js') }}"></script>
 
-        <script src="{{ url_for('static', filename='js/MessageService.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket/MessageService.js') }}"></script>
 
-        <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/SocketMessages.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/SocketEventHandlers.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/SocketEvents.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket/socket.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket/SocketMessages.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket/SocketEventHandlers.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/socket/SocketEvents.js') }}"></script>
 
 
         {% block script %}{% endblock %}

@@ -10,12 +10,12 @@ class ChangeHandler(FileSystemEventHandler):
         self.starter = starter
 
     def on_modified(self, event):
-        if event.src_path.endswith('.py'):
+        if not event.src_path.endswith('.log') and not event.is_directory:
             print(f"Changes detected: {event.src_path}")
             self.restart_gunicorn()
 
     def on_created(self, event):
-        if event.src_path.endswith('.py'):
+        if not event.src_path.endswith('.log') and not event.is_directory:
             print(f"New file created: {event.src_path}")
             self.restart_gunicorn()
 

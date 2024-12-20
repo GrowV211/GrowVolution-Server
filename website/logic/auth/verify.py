@@ -1,6 +1,7 @@
 from flask import request
 from website.data import User
 from website import APP
+from website.debugger import log
 import requests
 import jwt
 import os
@@ -23,31 +24,31 @@ def captcha_check():
     result = response.json()
 
     if not result.get("success") or result.get("score", 0) < 0.5:
+        log('warn', "Failed captcha check!")
         return "Du wurdest von reCAPTCHA als Bot eingestuft!"
 
     return None
 
 
-def _active_user(token):
-    if token:
-        try:
-            decoded = jwt.decode(token, key=APP.config['SECRET_KEY'], algorithms=['HS256'])
-            user = User.query.filter_by(id=decoded['user_id']).first()
-            return user
-        except jwt.ExpiredSignatureError:
-            return None
-        except jwt.InvalidTokenError:
-            return None
-        except jwt.InvalidSignatureError:
-            return None
-
-    return None
+def _decoded_token(token):
+    try:
+        return jwt.decode(token, key=APP.config['SECRET_KEY'], algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+    except jwt.InvalidSignatureError:
+        return None
 
 
 def active_user():
-    user = _active_user(request.cookies.get('token'))
-    if user:
-        return user
+    token = request.cookies.get('token')
+    if token:
+        decoded = _decoded_token(token)
+        if decoded:
+            user = User.query.filter_by(id=decoded['user_id']).first()
+            if user:
+                return user
 
     return None
 
