@@ -4,18 +4,25 @@ from pathlib import Path
 
 PROJECT_PATH = Path(__file__).resolve().parent
 
+
+def _restart_condition(event):
+    if event.src_path.endswith(".py") or event.src_path.endswith(".html"):
+        return True
+    return False
+
+
 class ChangeHandler(FileSystemEventHandler):
     def __init__(self, starter):
         self.process = None
         self.starter = starter
 
     def on_modified(self, event):
-        if not event.src_path.endswith('.log') and not event.is_directory:
+        if _restart_condition(event):
             print(f"Changes detected: {event.src_path}")
             self.restart_gunicorn()
 
     def on_created(self, event):
-        if not event.src_path.endswith('.log') and not event.is_directory:
+        if _restart_condition(event):
             print(f"New file created: {event.src_path}")
             self.restart_gunicorn()
 
