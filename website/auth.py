@@ -1,6 +1,7 @@
 from flask import Blueprint
 from . import ALL_METHODS
-from .logic.auth import login as lin, logout as lout, signup as s, confirm as c, notice as n, reset as r, forgot
+from .logic.auth import login as lin, signup as s, confirm as c, notice as n, reset as r, forgot
+from .logic.auth.session import clear_token
 
 auth = Blueprint('auth', __name__)
 
@@ -12,7 +13,7 @@ def login():
 
 @auth.route('/logout')
 def logout():
-    return lout.handle_request()
+    return clear_token('/')
 
 
 @auth.route('/signup', methods=ALL_METHODS)

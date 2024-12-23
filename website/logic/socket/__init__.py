@@ -1,10 +1,11 @@
 from ...logging import S_EVENTS
-from .events import (connect, disconnect, back, set_tab,
+from .events import (connect, back,
                      join_chatroom, availability_check, forgot_query,
                      chat_message, resend_mail, profile_interaction)
 from ..account.edit import handle_edit, handle_reset_request, handle_delete
 from ..search import handle_search
 from ..content.content import handle_content_interaction
+from ..auth.verify import active_session
 from .manage import send_message
 
 
@@ -15,7 +16,7 @@ def on_connect():
 
 @S_EVENTS.on('disconnect')
 def on_disconnect():
-    disconnect.handle_event()
+    active_session().set_socket(None)
 
 
 @S_EVENTS.on('back')
@@ -25,7 +26,7 @@ def on_back():
 
 @S_EVENTS.on('set_tab')
 def on_set_tab(tab):
-    set_tab.handle_event(tab)
+    active_session().set_tab(tab)
 
 
 @S_EVENTS.on('search')

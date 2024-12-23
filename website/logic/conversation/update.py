@@ -1,4 +1,4 @@
-from website.data import Message, User, add_model, Chatroom
+from website.data import Message, User, add_model, Session
 from website.logic.auth.verify import active_user
 from .chat import get_chat, render_message
 from markupsafe import Markup
@@ -16,9 +16,9 @@ def handle_request(data, socket):
     message = Message(sender.id, content, chat.id)
     add_model(message)
 
-    chatroom = Chatroom.query.filter(
-        Chatroom.chatID == chat.id,
-        Chatroom.socketID != socket
+    chatroom = Session.query.filter(
+        Session.chatID == chat.id,
+        Session.sid != socket
     ).first()
     updated = False
 

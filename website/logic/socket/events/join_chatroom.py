@@ -1,8 +1,8 @@
 from website.data import User
-from ..manage import join_chatroom, send_message
+from ..manage import send_message
 from ...account.user import user_attributes
 from ...conversation.chat import get_chat, render_chat
-from ...auth.verify import active_user
+from ...auth.verify import active_user, active_session
 from markupsafe import Markup
 
 
@@ -13,7 +13,7 @@ def handle_event(username):
 
     chat = get_chat(user, receiver)
 
-    join_chatroom(chat)
+    active_session().set_chat(chat.id)
 
     chat_html = render_chat(receiver, user_attributes(receiver, False), chat)
 

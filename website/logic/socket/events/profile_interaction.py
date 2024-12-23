@@ -1,13 +1,11 @@
-from flask import request
 from ....data import User
-from ..manage import send_message, get_socket
-from ...auth.verify import active_user
+from ..manage import send_message
+from ...auth.verify import active_session
 from ...account.user import handle_interaction
 
 
 def handle_event(data):
-    sid = request.sid
-    socket = get_socket(sid)
-    user = User.query.filter_by(username=socket.tab).first()
+    session = active_session()
+    user = User.query.filter_by(username=session.tab).first()
 
-    send_message('update', handle_interaction(user, user == active_user(), data))
+    send_message('update', handle_interaction(user, user == session.user, data))

@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
         availabilityResponseHandler(data)
     })
 
+    SOCKET.on('reload', () => {
+        window.location.reload()
+    })
+
     SOCKET.on('disconnect', () => {
         log('warn', "Socket disconnected... reconnecting.")
     })

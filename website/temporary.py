@@ -1,12 +1,14 @@
 import time
 import threading
 import random
-from . import APP
+from . import APP, SOCKET
 from .debugger import log
 from .logic.updating import user
+from .logic.socket.manage import send_message
 from datetime import datetime, timedelta
 
 ONE_DAY = "01:00:00:00"
+ONE_HOUR = "00:01:00:00"
 TEN_MINUTES = "00:00:10:00"
 
 CONFIRM = {}
@@ -90,6 +92,26 @@ def clear(key):
         LOCK.pop(key)
     if key in TIMES_LOCKED:
         TIMES_LOCKED.pop(key)
+
+
+def _clear_session(session_id):
+    from .data import Session, delete_model
+    session = Session.query.filter_by(id=session_id).first()
+    sid = session.sid
+    if sid:
+        send_message('reload', None, sid)
+        SOCKET.disconnect(sid)
+    delete_model(session)
+
+
+def _session_cycle(session_id):
+    seconds = _calc_seconds(ONE_HOUR) + 2
+    time.sleep(seconds)
+    _clear_session(session_id)
+
+
+def session_lifecycle(session_id):
+    threading.Thread(target=_session_cycle, args=(session_id,)).start()
 
 
 def _remaining_seconds():

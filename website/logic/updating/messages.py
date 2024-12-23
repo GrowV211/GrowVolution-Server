@@ -1,5 +1,5 @@
 from ..conversation.chat import get_chat
-from website.data import User, Socket, mod_messages, admin_messages
+from website.data import User, Session, mod_messages, admin_messages
 from ..socket.manage import send_message
 
 
@@ -11,9 +11,9 @@ def _empty_message_update():
 
 def update_user_messages(data):
     user = User.query.filter_by(username=data['user']).first()
-    socket = Socket.query.filter_by(userID=user.id).first()
+    sessions = Session.query.filter_by(userID=user.id).all()
 
-    if not socket:
+    if not sessions:
         return
 
     msg_type = data['type']
@@ -21,36 +21,38 @@ def update_user_messages(data):
     if msg_type == 'messages':
         target_user = data['chat_user']
 
-        update = _empty_message_update()
+        for session in sessions:
+            update = _empty_message_update()
 
-        if socket.tab == 'chats':
-            target_user = User.query.filter_by(username=target_user).first()
-            chat = get_chat(user, target_user)
+            if session.tab == 'chats':
+                target_user = User.query.filter_by(username=target_user).first()
+                chat = get_chat(user, target_user)
 
-            update['user'] = target_user.username
-            update['messages'] = user.get_unread_chat_messages(chat)
-            update['last'] = chat.get_last_message_text(user)
-            send_message('update_messages', update, socket.id)
-
-        update = _empty_message_update()
-        update['messages'] = user.get_unread_messages()
-        send_message('update_messages', update, socket.id)
+                update['user'] = target_user.username
+                update['messages'] = user.get_unread_chat_messages(chat)
+                update['last'] = chat.get_last_message_text(user)
+                send_message('update_messages', update, session.sid)
+            else:
+                update['messages'] = user.get_unread_messages()
+                send_message('update_messages', update, session.sid)
 
     elif msg_type == 'requests':
-        send_message('update_messages', {
-            'type': msg_type,
-            'messages': user.get_unread_requests()
-        }, socket.id)
+        for session in sessions:
+            send_message('update_messages', {
+                'type': msg_type,
+                'messages': user.get_unread_requests()
+            }, session.sid)
 
 
 def _send_moderation_update(users, msg_type, messages):
     for user in users:
-        socket = Socket.query.filter_by(userID=user.id).first()
-        if socket:
-            send_message('update_messages', {
-                'type': msg_type,
-                'messages': messages
-            }, socket.id)
+        sessions = Session.query.filter_by(userID=user.id).all()
+        if sessions:
+            for session in sessions:
+                send_message('update_messages', {
+                    'type': msg_type,
+                    'messages': messages
+                }, session.sid)
 
 
 def update_moderation_messages(data):

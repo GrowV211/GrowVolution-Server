@@ -15,8 +15,7 @@ CRYPT = Bcrypt(APP)
 with APP.app_context():
     with DB.engine.connect() as conn:
         conn.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
-        conn.execute(text("TRUNCATE TABLE chatroom"))
-        conn.execute(text("TRUNCATE TABLE socket"))
+        conn.execute(text("TRUNCATE TABLE ClientSession"))
         conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
 
 PROOF_PATH = Path(APP.static_folder) / 'proof'
@@ -130,7 +129,7 @@ class User(DB.Model):
     teams = DB.relationship('Team', secondary=TEAMS, back_populates='members')
     invitations = DB.relationship('Invitation', back_populates='user')
 
-    sockets = DB.relationship('Socket', back_populates='user')
+    sessions = DB.relationship('Session', back_populates='user')
 
     def __init__(self, first, last, username, email, password, alt_bg):
         self.first = first
@@ -318,7 +317,7 @@ class Chat(DB.Model):
     participants = DB.relationship('User', secondary=CHATS, back_populates='chats')
     messages = DB.relationship('Message', back_populates='chat', cascade='all, delete-orphan')
 
-    chatroom = DB.relationship('Chatroom', back_populates='chat')
+    sessions = DB.relationship('Session', back_populates='chat')
 
     def __init__(self):
         self.salt = os.urandom(16)
@@ -794,40 +793,34 @@ class Invitation(DB.Model):
         self.teamID = team
 
 
-class Socket(DB.Model):
-    __tablename__ = 'socket'
+class Session(DB.Model):
+    __tablename__ = 'ClientSession'
 
-    id = DB.Column(DB.String(255), primary_key=True)
+    id = DB.Column(DB.String(32), primary_key=True)
+    sid = DB.Column(DB.String(32))
+    tab = DB.Column(DB.String(32))
+
     userID = DB.Column(DB.Integer, DB.ForeignKey('account.id'))
+    chatID = DB.Column(DB.Integer, DB.ForeignKey('chat.id'))
 
-    tab = DB.Column(DB.String(64), nullable=False, default='home')
+    user = DB.relationship('User', foreign_keys=[userID], back_populates='sessions')
+    chat = DB.relationship('Chat', foreign_keys=[chatID], back_populates='sessions')
 
-    user = DB.relationship('User', foreign_keys=[userID], back_populates='sockets')
+    def __init__(self, uuid):
+        self.id = uuid
 
-    chatroom = DB.relationship('Chatroom', back_populates='socket', cascade="all, delete-orphan" )
+    def set_socket(self, sid):
+        self.sid = sid
+        commit()
 
-    def __init__(self, socket, user=None):
-        self.id = socket
-        self.userID = user
-
-    def set_active_tab(self, tab):
+    def set_tab(self, tab):
         self.tab = tab
         commit()
 
+    def set_user(self, user):
+        self.userID = user
+        commit()
 
-class Chatroom(DB.Model):
-    __tablename__ = 'chatroom'
-
-    socketID = DB.Column(DB.String(255), DB.ForeignKey('socket.id'), primary_key=True)
-    chatID = DB.Column(DB.Integer, DB.ForeignKey('chat.id'), primary_key=True)
-
-    socket = DB.relationship('Socket', foreign_keys=[socketID], back_populates='chatroom')
-    chat = DB.relationship('Chat', foreign_keys=[chatID], back_populates='chatroom')
-
-    def __init__(self, socket, chat):
-        self.socketID = socket
+    def set_chat(self, chat):
         self.chatID = chat
-
-    def update_socket(self, socket):
-        self.socketID = socket
         commit()

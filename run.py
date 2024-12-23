@@ -6,6 +6,7 @@ import os
 
 FILE_PATH = Path(__file__).resolve().parent
 GUNICORN_CMD = ['gunicorn', '-b', '127.0.0.1:5000', '-k', 'eventlet', 'app:app']
+DUMMY_CMD = ['gunicorn', '-b', '127.0.0.1:5000', 'dummy:app']
 PROCESS = None
 
 EXEC_MODE = ''
@@ -13,6 +14,18 @@ EXEC_MODE = ''
 
 def start_server():
     return subprocess.Popen(GUNICORN_CMD)
+
+
+def _start_dummy():
+    return subprocess.Popen(DUMMY_CMD, stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
+
+
+def start_dummy():
+    print("Starting dummy server...")
+    dummy = _start_dummy()
+    print("Dummy server running.\n")
+    return dummy
 
 
 def is_debug():
@@ -36,23 +49,31 @@ def clear_logs():
 
 def console():
     info = ("You can enter the following commands:"
-          "\n\n\t1. start - to start the server"
-          "\n\t2. stop - to stop the server"
-          "\n\t3. restart - to restart the server"
+          "\n\n\t1. start - to start the main server"
+          "\n\t2. stop - to stop the main server"
+          "\n\t3. restart - to restart the main server"
           "\n\t4. clear-logs - to clear the log folder"
-          "\n\t5. exit - to exit this script\n")
+          "\n\n\t5. start-dummy - to start the dummy server"
+          "\n\t6. stop-dummy - to stop the dummy server (not recommended)"
+          "\n\n\t5. exit - to exit this script\n")
 
     print("GrowVolution 2024 - GNU General Public License\n\n"
-          f"Start script running.\n{info}")
+          f"Start script running.\n")
+
+    dummy = start_dummy()
+
+    print(info)
 
     while True:
         cmd = input()
 
         if cmd == 'start':
+            stop_dummy(dummy)
             main()
 
         elif cmd == 'stop':
             stop("The server is not running.")
+            dummy = start_dummy()
 
         elif cmd == 'restart':
             stop("The server was not running. Just starting it now.")
@@ -61,8 +82,17 @@ def console():
         elif cmd == 'clear-logs':
             clear_logs()
 
+        elif cmd == 'start-dummy':
+            stop('')
+            stop_dummy(dummy)
+            dummy = start_dummy()
+
+        elif cmd == 'stop-dummy':
+            stop_dummy(dummy)
+
         elif cmd == 'exit':
             stop('')
+            stop_dummy(dummy)
             print("Thank you for playing the game of life, bye!")
             break
 
@@ -75,6 +105,14 @@ def stop(alt):
         _stop()
     else:
         print(alt)
+
+
+def stop_dummy(dummy):
+    if dummy:
+        print("Stopping dummy server...")
+        dummy.terminate()
+        dummy.wait()
+        print("Dummy server stopped.")
 
 
 def _stop():

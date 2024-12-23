@@ -1,9 +1,7 @@
 from flask import request
 from . import APP, SOCKET
 from .debugger import log
-
-SERVER_DOMAIN = 'https://growvolution.org'
-SERVER_IP = 'https://212.132.125.218'
+from .logic.auth.session import handle_session
 
 
 class SocketEvent:
@@ -46,10 +44,12 @@ def socket_event_data(*args):
 def log_request():
     ip = request.remote_addr
     method = request.method
-    url = request.url.removeprefix(SERVER_DOMAIN).removeprefix(SERVER_IP)
+    path = request.path
     user_agent = request.headers.get('User-Agent')
 
-    log(f'{method}', f"{url} from {ip} with [{user_agent}]")
+    log(f'{method}', f"{path} from {ip} with [{user_agent}]")
+
+    return handle_session(path)
 
 
 @SOCKET.on('*')

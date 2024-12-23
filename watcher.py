@@ -6,7 +6,7 @@ PROJECT_PATH = Path(__file__).resolve().parent
 
 
 def _restart_condition(event):
-    if event.src_path.endswith(".py") or event.src_path.endswith(".html"):
+    if event.src_path.endswith(".py") or event.src_path.endswith(".html") or event.src_path.endswith(".env"):
         return True
     return False
 

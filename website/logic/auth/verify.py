@@ -1,5 +1,5 @@
 from flask import request
-from website.data import User
+from website.data import User, Session
 from website import APP
 from website.debugger import log
 import requests
@@ -42,15 +42,8 @@ def _decoded_token(token):
 
 
 def active_user():
-    token = request.cookies.get('token')
-    if token:
-        decoded = _decoded_token(token)
-        if decoded:
-            user = User.query.filter_by(id=decoded['user_id']).first()
-            if user:
-                return user
-
-    return None
+    session = active_session()
+    return active_session().user if session else None
 
 
 def is_remembered():
@@ -58,3 +51,13 @@ def is_remembered():
         return True
 
     return False
+
+
+def active_session_id():
+    decoded = _decoded_token(request.cookies.get('token'))
+    return decoded['session_id'] if decoded else None
+
+
+def active_session():
+    session_id = active_session_id()
+    return Session.query.filter_by(id=session_id).first() if session_id else None
