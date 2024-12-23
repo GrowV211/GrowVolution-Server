@@ -41,3 +41,6 @@ def render_with_flash(template, message, category, **kwargs):
 
 def goto_login():
     return redirect('/login')
+
+def go_home():
+    return redirect('/')

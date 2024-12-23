@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from pathlib import Path
 from markupsafe import Markup
+import secrets
 import re
 import os
 
@@ -93,7 +94,6 @@ class User(DB.Model):
     username = DB.Column(DB.String(35), nullable=False, unique=True)
     email = DB.Column(DB.String(60), nullable=False, unique=True)
     psw_crypt = DB.Column(DB.String(256), nullable=False)
-    salt = DB.Column(DB.LargeBinary(16), nullable=False)
 
     info = DB.Column(DB.String(500), nullable=True)
     img = DB.Column(DB.String(39), nullable=True)
@@ -138,7 +138,6 @@ class User(DB.Model):
         self.email = email
 
         self.psw_crypt = CRYPT.generate_password_hash(password).decode()
-        self.salt = os.urandom(16)
 
         self.img = None
         self.alt_bg = alt_bg
@@ -803,6 +802,9 @@ class Session(DB.Model):
     userID = DB.Column(DB.Integer, DB.ForeignKey('account.id'))
     chatID = DB.Column(DB.Integer, DB.ForeignKey('chat.id'))
 
+    valid = DB.Column(DB.Boolean, nullable=False, default=True)
+    csrf_token = DB.Column(DB.String(32))
+
     user = DB.relationship('User', foreign_keys=[userID], back_populates='sessions')
     chat = DB.relationship('Chat', foreign_keys=[chatID], back_populates='sessions')
 
@@ -824,3 +826,13 @@ class Session(DB.Model):
     def set_chat(self, chat):
         self.chatID = chat
         commit()
+
+    def set_invalid(self):
+        self.valid = False
+        commit()
+
+    def csrf(self, set_token=True):
+        self.csrf_token = secrets.token_hex(32) if set_token else None
+        commit()
+        if set_token:
+            return self.csrf_token

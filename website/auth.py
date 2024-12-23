@@ -1,22 +1,23 @@
-from flask import Blueprint
-from . import ALL_METHODS
+from flask import Blueprint, redirect
+from . import ALL_METHODS, LIMITER
 from .logic.auth import login as lin, signup as s, confirm as c, notice as n, reset as r, forgot
-from .logic.auth.session import clear_token
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login', methods=ALL_METHODS)
+@LIMITER.limit("3 per minute")
 def login():
     return lin.handle_request()
 
 
 @auth.route('/logout')
 def logout():
-    return clear_token('/')
+    return redirect('/')
 
 
 @auth.route('/signup', methods=ALL_METHODS)
+@LIMITER.limit("3 per minute")
 def signup():
     return s.handle_request()
 

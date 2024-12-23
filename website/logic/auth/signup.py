@@ -1,6 +1,6 @@
 from flask import request, redirect
 from website.basic import render,render_with_flash
-from .verify import captcha_check
+from .verify import captcha_check, active_session
 from website.data import User, add_model
 from website.mailservice import send_confirm_mail
 from website.temporary import lifecycle, new_process, TEN_MINUTES, CONFIRM
@@ -40,18 +40,21 @@ def _random_bg():
 
 def handle_request():
     template = 'auth/signup.html'
+    session = active_session()
 
     if request.method == "POST":
 
         check = captcha_check()
 
         if check:
-            return render_with_flash(template, check, 'danger')
+            return render_with_flash(template, check, 'danger',
+                                     csrf_token=session.csrf())
 
         psw = request.form.get('psw')
 
         if not psw:
-            return render_with_flash(template, "Dem Server wurde ein leeres Passwort übergeben!", "danger")
+            return render_with_flash(template, "Dem Server wurde ein leeres Passwort übergeben!",
+                                     'danger', csrf_token=session.csrf())
 
         first = request.form.get('first')
         user = request.form.get('user')
@@ -64,7 +67,7 @@ def handle_request():
 
         lifecycle(CONFIRM, pid, (code, _confirm, user_model), TEN_MINUTES)
 
+        session.csrf(False)
         return redirect(f'/notice/{pid}')
 
-    else:
-        return render('auth/signup.html')
+    return render('auth/signup.html', csrf_token=session.csrf())

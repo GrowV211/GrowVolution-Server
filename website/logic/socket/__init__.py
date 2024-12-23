@@ -26,7 +26,9 @@ def on_back():
 
 @S_EVENTS.on('set_tab')
 def on_set_tab(tab):
-    active_session().set_tab(tab)
+    session = active_session()
+    if session:
+        session.set_tab(tab)
 
 
 @S_EVENTS.on('search')

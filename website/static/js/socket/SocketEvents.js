@@ -1,8 +1,3 @@
-function clearSession() {
-    sessionStorage.removeItem('password')
-    sessionStorage.removeItem('username')
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     SOCKET.on('connect', () => {
         log('info', "Socket connected.")
@@ -10,27 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     SOCKET.on('connect_info', (data) => {
         EXEC_MODE = data['exec']
-        if (data['has_user'] && !sessionStorage.getItem('username')) {
-            if (localStorage.getItem('user_key'))
-                localStorage.removeItem('user_key')
-            else
-                window.location.href = "https://growvolution.org/logout"
-        } else if (!data['has_user'] && sessionStorage.getItem('username')) {
-            clearSession()
-        }
-    })
-
-    SOCKET.on('user_salt', (salt) => {
-        console.log('dbg:', salt)
-        generateKey([
-            sessionStorage.getItem('username'),
-            sessionStorage.getItem('password')
-        ], salt)
-            .then(key => exportKeyToString(key))
-            .then(keyString => {
-                localStorage.setItem('user_key', keyString)
-                clearSession()
-            })
+        console.log('info', "Server is running in " + EXEC_MODE + " mode.")
     })
 
     SOCKET.on('update_messages', updateMessages)
@@ -72,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     SOCKET.on('reload', () => {
+        log('info', "Server requested reload.")
         window.location.reload()
     })
 

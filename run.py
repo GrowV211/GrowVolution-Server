@@ -44,7 +44,7 @@ def clear_logs():
         else:
             print(f"Skipping {file} (not a file)...")
 
-    print("\nLog folder cleared.")
+    print("\nLog folder cleared.\n")
 
 
 def console():
@@ -53,9 +53,10 @@ def console():
           "\n\t2. stop - to stop the main server"
           "\n\t3. restart - to restart the main server"
           "\n\t4. clear-logs - to clear the log folder"
-          "\n\n\t5. start-dummy - to start the dummy server"
-          "\n\t6. stop-dummy - to stop the dummy server (not recommended)"
-          "\n\n\t5. exit - to exit this script\n")
+          "\n\t5. clear - to clear the console"
+          "\n\n\t6. start-dummy - to start the dummy server"
+          "\n\t7. stop-dummy - to stop the dummy server (not recommended)"
+          "\n\n\t8. exit - to exit this script\n")
 
     print("GrowVolution 2024 - GNU General Public License\n\n"
           f"Start script running.\n")
@@ -82,6 +83,9 @@ def console():
         elif cmd == 'clear-logs':
             clear_logs()
 
+        elif cmd == 'clear':
+            subprocess.run('cls' if os.name == 'nt' else 'clear', shell=True)
+
         elif cmd == 'start-dummy':
             stop('')
             stop_dummy(dummy)
@@ -91,7 +95,7 @@ def console():
             stop_dummy(dummy)
 
         elif cmd == 'exit':
-            stop('')
+            stop()
             stop_dummy(dummy)
             print("Thank you for playing the game of life, bye!")
             break
@@ -100,11 +104,11 @@ def console():
             print(f"Unknown command.\n{info}")
 
 
-def stop(alt):
+def stop(alt=None):
     if PROCESS:
         _stop()
-    else:
-        print(alt)
+    elif alt:
+        print(f"{alt}\n")
 
 
 def stop_dummy(dummy):
@@ -112,7 +116,7 @@ def stop_dummy(dummy):
         print("Stopping dummy server...")
         dummy.terminate()
         dummy.wait()
-        print("Dummy server stopped.")
+        print("Dummy server stopped.\n")
 
 
 def _stop():
@@ -132,18 +136,18 @@ def _stop():
         PROCESS.wait()
 
     PROCESS = None
-    print("Server stopped.")
+    print("Server stopped.\n")
 
 
 def main():
     global PROCESS
 
     if is_debug():
-        print("Starting server in debug mode.")
+        print("Starting server in debug mode...\n")
         PROCESS = start_watching(start_server)
 
     else:
-        print("Starting server in production mode.")
+        print("Starting server in production mode...\n")
         PROCESS = start_server()
 
 

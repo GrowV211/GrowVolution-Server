@@ -1,5 +1,5 @@
 from flask import request
-from website.data import User, Session
+from website.data import Session
 from website import APP
 from website.debugger import log
 import requests
@@ -23,9 +23,9 @@ def captcha_check():
     response = requests.post(verification_url, data=data)
     result = response.json()
 
-    if not result.get("success") or result.get("score", 0) < 0.5:
+    if not result.get("success") or result.get("score", 0) < 0.66:
         log('warn', "Failed captcha check!")
-        return "Du wurdest von reCAPTCHA als Bot eingestuft!"
+        return "Du wurdest von reCAPTCHA als unvertrauenswürdig eingestuft!"
 
     return None
 
@@ -43,21 +43,14 @@ def _decoded_token(token):
 
 def active_user():
     session = active_session()
-    return active_session().user if session else None
+    return active_session().user if session.userID else None
 
 
-def is_remembered():
-    if active_user():
-        return True
-
-    return False
-
-
-def active_session_id():
+def session_data():
     decoded = _decoded_token(request.cookies.get('token'))
-    return decoded['session_id'] if decoded else None
+    return decoded
 
 
 def active_session():
-    session_id = active_session_id()
-    return Session.query.filter_by(id=session_id).first() if session_id else None
+    data = session_data()
+    return Session.query.filter_by(id=data['session_id']).first()
