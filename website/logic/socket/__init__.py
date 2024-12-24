@@ -19,6 +19,11 @@ def on_disconnect():
     active_session().set_socket(None)
 
 
+@S_EVENTS.on('verify_session')
+def on_verify_session():
+    active_session().set_verified()
+
+
 @S_EVENTS.on('back')
 def on_back():
     back.handle_event()

@@ -1,6 +1,6 @@
 from flask import request
 from website.basic import render, render_with_flash, goto_login, go_home
-from website.data import User
+from website.data import User, Password, add_model
 from .verify import captcha_check, active_session, active_user
 
 
@@ -10,6 +10,7 @@ def handle_request():
 
     if active_user():
         session.set_user(None)
+        session.unset_password()
         return goto_login()
 
     if request.method == "POST":
@@ -22,10 +23,19 @@ def handle_request():
         acc = request.form['user']
         user = User.query.filter((User.username == acc) | (User.email == acc)).first()
 
-        if user and user.check_psw(request.form['psw']):
+        psw = request.form['psw']
+
+        if user and psw and user.check_psw(psw):
             session.set_user(user.id)
             session.csrf(False)
+
+            if not user.password:
+                password = Password(user.id)
+                add_model(password)
+                password.safe_password(psw)
+
             return go_home()
+
         elif user:
             return render_with_flash(template, "Falsches Passwort!", 'danger',
                                      user=acc, csrf_token=session.csrf())

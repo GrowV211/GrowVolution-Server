@@ -3,9 +3,11 @@ import threading
 import random
 from . import APP, SOCKET
 from .debugger import log
-from .logic.updating import user
+from .logic.updating import user, session
 from .logic.socket.manage import send_message
 from datetime import datetime, timedelta
+import secrets
+import string
 
 ONE_DAY = "01:00:00:00"
 ONE_HOUR = "00:01:00:00"
@@ -17,7 +19,19 @@ TIMES_LOCKED = {}
 
 RESET = {}
 
-STOPPED = False
+TMP_PASSWORD = ""
+RECOVERY_PSW = ""
+CHARSET = string.ascii_letters + string.digits + string.punctuation
+
+
+def _update_password_tmp():
+    global TMP_PASSWORD
+    TMP_PASSWORD = ''.join(secrets.choice(CHARSET) for _ in range(16))
+
+
+def _update_password_recovery():
+    global RECOVERY_PSW
+    RECOVERY_PSW = ''.join(secrets.choice(CHARSET) for _ in range(32))
 
 
 def _calc_seconds(time_string):
@@ -94,26 +108,6 @@ def clear(key):
         TIMES_LOCKED.pop(key)
 
 
-def _clear_session(session_id):
-    from .data import Session, delete_model
-    session = Session.query.filter_by(id=session_id).first()
-    sid = session.sid
-    if sid:
-        send_message('reload', None, sid)
-        SOCKET.disconnect(sid)
-    delete_model(session)
-
-
-def _session_cycle(session_id):
-    seconds = _calc_seconds(ONE_HOUR) + 2
-    time.sleep(seconds)
-    _clear_session(session_id)
-
-
-def session_lifecycle(session_id):
-    threading.Thread(target=_session_cycle, args=(session_id,)).start()
-
-
 def _remaining_seconds():
     now = datetime.now()
     end_of_day = datetime.combine(now.date(), datetime.max.time())
@@ -122,22 +116,59 @@ def _remaining_seconds():
     return int(remaining.total_seconds())
 
 
+def _update_users(date):
+    log('info', "Updating user database...")
+    with APP.app_context():
+        user.update(date)
+
+
+def _clear_sessions():
+    log('info', "Clearing expired sessions...")
+    with APP.app_context():
+        session.clear_expired(datetime.now())
+
+
+def _update_passwords(mode):
+    log('info', f"Updating {mode} passwords...")
+
+    old_psw = TMP_PASSWORD if mode == 'TMP' else RECOVERY_PSW
+    _update_password_tmp() if mode == 'TMP' else _update_password_recovery()
+
+    with APP.app_context():
+        user.update_passwords(old_psw, mode)
+
+
 def _updater():
     timer = _remaining_seconds()
     date = datetime.now().date()
+    session_update_counter = 0
+    recovery_update_counter = 0
 
     log('info', f"Database updater started, next update in {timer} seconds.")
 
+    _update_password_tmp()
+    _update_password_recovery()
+
     while True:
-        time.sleep(timer)
+        time.sleep(30)
+        timer -= 30
+        session_update_counter += 1
+        recovery_update_counter += 1
 
-        log('info', "Updating database.")
+        _update_passwords('TMP')
 
-        with APP.app_context():
-            user.update(date)
+        if timer <= 0:
+            _update_users(date)
+            timer = _calc_seconds(ONE_DAY)
+            date += timedelta(days=1)
 
-        timer = _calc_seconds(ONE_DAY)
-        date += timedelta(days=1)
+        if session_update_counter >= 10:
+            _clear_sessions()
+            session_update_counter = 0
+
+        if recovery_update_counter >= 120:
+            _update_passwords('RECOVERY')
+            recovery_update_counter = 0
 
 
 def start_updater():

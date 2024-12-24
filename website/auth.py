@@ -1,6 +1,6 @@
-from flask import Blueprint, redirect
+from flask import Blueprint
 from . import ALL_METHODS, LIMITER
-from .logic.auth import login as lin, signup as s, confirm as c, notice as n, reset as r, forgot
+from .logic.auth import login as lin, logout as lout, signup as s, confirm as c, notice as n, reset as r, forgot
 
 auth = Blueprint('auth', __name__)
 
@@ -13,7 +13,7 @@ def login():
 
 @auth.route('/logout')
 def logout():
-    return redirect('/')
+    return lout.handle_request()
 
 
 @auth.route('/signup', methods=ALL_METHODS)

@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     SOCKET.on('connect', () => {
         log('info', "Socket connected.")
+        SOCKET.emit('verify_session')
     })
 
     SOCKET.on('connect_info', (data) => {

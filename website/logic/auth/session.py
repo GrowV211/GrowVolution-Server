@@ -84,6 +84,10 @@ def _verify_active_session(data, sess):
         sess.set_invalid()
         return _refuse_request("Session blocked due to too many invalid CSRF checks!")
 
+    elif session.get('dynamic_requests') and session['dynamic_requests'] >= 2 and not sess.verified:
+        sess.set_invalid()
+        return _refuse_request("Session has not been verified and will be blocked!")
+
     return None
 
 
