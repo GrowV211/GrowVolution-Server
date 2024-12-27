@@ -1,5 +1,5 @@
 from . import APP
-from .crypt import encrypt_bytes, decrypt_bytes, async_encrypt, async_decrypt
+from .crypt import encrypt_bytes, decrypt_bytes
 from flask import url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 from pathlib import Path
 from markupsafe import Markup
+from .debugger import log
 import secrets
 import re
 
@@ -95,8 +96,8 @@ class User(DB.Model):
     email = DB.Column(DB.String(60), nullable=False, unique=True)
 
     psw_crypt = DB.Column(DB.String(256), nullable=False)
-    has_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
-    update_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
+    #has_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
+    #update_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
 
     info = DB.Column(DB.String(500), nullable=True)
     img = DB.Column(DB.String(39), nullable=True)
@@ -190,6 +191,7 @@ class User(DB.Model):
     def check_psw(self, password):
         return CRYPT.check_password_hash(self.psw_crypt, password)
 
+    '''
     def keypair_generated(self):
         self.has_async_keys = True
         commit()
@@ -201,6 +203,7 @@ class User(DB.Model):
     def set_keypair_updated(self):
         self.update_async_keys = False
         commit()
+    '''
 
     def add_relator(self, relator):
         if not relator in self.relators:
@@ -337,9 +340,13 @@ class Chat(DB.Model):
         if self.messages:
             last = self.messages[-1]
             by_user = 'ich' if last.sender == user else last.sender.first
-            last_content = last.get_content(user.username, user.password.get_password())
 
-            if len(last.content) > 25:
+            chat_key = ChatKey.query.filter_by(chatID=self.id, userID=user.id).first()
+            key = chat_key.get_chat_key(user.password[0].get_password(True))
+
+            last_content = last.get_content(key)
+
+            if len(last_content) > 25:
                 last = last_content[:25] + '...'
             else:
                 last = last_content
@@ -876,24 +883,33 @@ class Password(DB.Model):
         self.enc_psw = encrypt_bytes(psw, SESSION_PSW)
         commit()
 
-    def get_password(self):
+    # Always use this function with responsibility!
+    # Never trust clones which are not sharing their code!
+    def get_password(self, skip_verification=False):
+        if not skip_verification:
+            from .logic.auth.verify import active_user
+            user = active_user()
+            if not user or self.userID != user.id:
+                log('warn', "User password was requested with invalid user data!")
+                return None
+
         from .temporary import SESSION_PSW
         return decrypt_bytes(self.enc_psw, SESSION_PSW, True)
 
 
 class ChatKey(DB.Model):
     __tablename__ = 'ChatKey'
-    userID = DB.Column(DB.Integer, primary_key=True, nullable=False)
     chatID = DB.Column(DB.Integer, primary_key=True, nullable=False)
+    userID = DB.Column(DB.Integer, primary_key=True, nullable=False)
     enc_chat_key = DB.Column(DB.LargeBinary, nullable=False)
 
-    def __init__(self, user_id, username, chat, chat_key):
-        self.userID = user_id
+    def __init__(self, chat, user, chat_key):
         self.chatID = chat
-        self.enc_chat_key = async_encrypt(chat_key, username)
+        self.userID = user.id
+        self.enc_chat_key = encrypt_bytes(chat_key, user.password[0].get_password(True))
 
-    def get_chat_key(self, username, password):
-        return async_decrypt(self.enc_chat_key, password, username).decode('utf-8')
+    def get_chat_key(self, password):
+        return decrypt_bytes(self.enc_chat_key, password, True)
 
 
 class RecoveryAuth(DB.Model):

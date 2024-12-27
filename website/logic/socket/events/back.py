@@ -1,7 +1,7 @@
 from ....basic import render
 from ....data import User
 from ..manage import send_message
-from ...auth.verify import active_user, active_session
+from ...auth.verify import active_session
 from ...conversation import chats
 from ...account.user import render_profile
 from markupsafe import Markup
@@ -24,7 +24,7 @@ def handle_event():
     elif session_tab == 'chats':
         session.set_chat(None)
         send_message('update', {
-            'html': Markup(chats.get_chat_list(active_user())),
+            'html': Markup(chats.get_chat_list(session.user)),
             'type': 'chats'
         })
 
@@ -33,4 +33,4 @@ def handle_event():
 
         if user:
             session.set_chat(None)
-            send_message('update', Markup(render_profile(user, True, user == active_user())))
+            send_message('update', Markup(render_profile(user, True, user == session.user)))

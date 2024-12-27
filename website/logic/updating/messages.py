@@ -38,10 +38,11 @@ def update_user_messages(data):
 
     elif msg_type == 'requests':
         for session in sessions:
-            send_message('update_messages', {
-                'type': msg_type,
-                'messages': user.get_unread_requests()
-            }, session.sid)
+            if session.sid:
+                send_message('update_messages', {
+                    'type': msg_type,
+                    'messages': user.get_unread_requests()
+                }, session.sid)
 
 
 def _send_moderation_update(users, msg_type, messages):

@@ -2,7 +2,6 @@ from flask import request
 from website.basic import render, render_with_flash, goto_login, go_home
 from website.data import User, Password, add_model
 from .verify import captcha_check, active_session, active_user
-from ...crypt import create_async_keypair
 
 
 def handle_request():
@@ -34,12 +33,6 @@ def handle_request():
                 password = Password(user.id)
                 add_model(password)
                 password.safe_password(psw)
-
-            if not user.has_async_keys:
-                create_async_keypair(psw, user.username)
-
-            elif user.update_async_keys:
-                pass
 
             return go_home()
 

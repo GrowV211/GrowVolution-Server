@@ -10,11 +10,13 @@ import secrets
 import string
 
 KEY_FOLDER = Path(__file__).resolve().parent / 'keys'
-CHARSET = string.ascii_letters + string.digits + string.punctuation
+
+SAFE_PUNCTUATION = "!#$%&()*+,-./:;<=>?@[]^_{|}~"
+CHARSET = string.ascii_letters + string.digits + SAFE_PUNCTUATION
 
 
 def random_password(length: int = 32) -> str:
-    return (''.join(secrets.choice(CHARSET) for _ in range(length)))
+    return ''.join(secrets.choice(CHARSET) for _ in range(length))
 
 
 def _derive_key(password: str, salt: bytes) -> bytes:
@@ -40,6 +42,9 @@ def decrypt_bytes(data: bytes, password: str, return_as_str: bool = False) -> by
     decrypted_data = cipher.update(encrypted_data) + cipher.finalize()
     return decrypted_data.decode() if return_as_str else decrypted_data
 
+'''
+
+    The following code is currently redundant.
 
 def create_async_keypair(password: str, filename: str):
 
@@ -73,7 +78,7 @@ def async_encrypt(data: bytes | str, filename: str) -> bytes:
         mgf=padding.MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None))
 
 
-def async_decrypt(data: bytes, password: str, filename: str) -> bytes | str:
+def async_decrypt(data: bytes, password: str, filename: str, return_as_str: bool = False) -> bytes | str:
 
     with open(KEY_FOLDER / "private" / f"{filename}.pem", "rb") as private_file:
         private_key = serialization.load_pem_private_key(private_file.read(),
@@ -83,7 +88,7 @@ def async_decrypt(data: bytes, password: str, filename: str) -> bytes | str:
     decrypted_data = private_key.decrypt(data, padding.OAEP(
         mgf=padding.MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None))
 
-    return decrypted_data
+    return decrypted_data.decode() if return_as_str else decrypted_data
 
 
 def delete_keypair(filename: str):
@@ -93,3 +98,4 @@ def delete_keypair(filename: str):
         public.unlink()
     if private.exists():
         private.unlink()
+'''

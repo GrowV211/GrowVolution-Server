@@ -14,10 +14,10 @@ def handle_request(data, socket):
     chat = get_chat(sender, receiver)
     content = data['content']
 
-    chat_key = ChatKey.query.filter_by(chatID=chat.id, userID=sender.id).first()
-    key = chat_key.get_chat_key(sender.username, sender.password[0].get_password())
+    key = ChatKey.query.filter_by(chatID=chat.id, userID=sender.id).first()
+    chat_key = key.get_chat_key(sender.password[0].get_password(True)) # Skipping cause sender = active_user()
 
-    message = Message(sender.id, content, chat.id, key)
+    message = Message(sender.id, content, chat.id, chat_key)
     add_model(message)
 
     chatroom = Session.query.filter(
@@ -28,7 +28,7 @@ def handle_request(data, socket):
 
     if chatroom:
         from ..socket.manage import send_message
-        send_message('update_chat', Markup(render_message('received', message, key)), chatroom.socketID)
+        send_message('update_chat', Markup(render_message('received', message, chat_key)), chatroom.sid)
         message.set_read()
         updated = True
 
@@ -41,4 +41,4 @@ def handle_request(data, socket):
             'chat_user': sender.username
         })
 
-    return Markup(render_message('sent', message, key))
+    return Markup(render_message('sent', message, chat_key))

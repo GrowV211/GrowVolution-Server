@@ -1,8 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 APP = Flask(__name__)
+
+
+@APP.route('/')
+def maintenance():
+    return render_template('offline.html')
 
 
 @APP.route('/about')
@@ -20,10 +25,9 @@ def impressum():
     return render_template('impressum.html')
 
 
-@APP.route('/')
 @APP.route('/<path:path>')
-def maintenance(path=None):
-    return render_template('offline.html')
+def go_home(path):
+    return redirect('/')
 
 
 def init_app():

@@ -57,14 +57,14 @@ function init() {
         })
     })
 
-    setInterval(() => {
-        if (search.value.length < 1) {
+   search.addEventListener("input", () => {
+       if (search.value.length < 1) {
             container.innerHTML = ""
             return
         }
 
         updateContainer(search.value)
-    }, 1000)
+   })
 }
 
 document.addEventListener("DOMContentLoaded", init);

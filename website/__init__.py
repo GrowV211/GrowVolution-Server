@@ -5,12 +5,15 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 from pathlib import Path
+import warnings
 import os
+
+warnings.filterwarnings("ignore", message="Using the in-memory storage for tracking rate limits")
 
 APP = Flask(__name__)
 SOCKET = SocketIO(APP, async_mode='eventlet')
 APP.wsgi_app = ProxyFix(APP.wsgi_app, x_for=1, x_proto=1)
-LIMITER = Limiter(get_remote_address, app=APP, default_limits=["500 per day", "100 per hour"])
+LIMITER = Limiter(get_remote_address, default_limits=["500 per day", "100 per hour"])
 
 ALL_METHODS = ['GET', 'POST']
 
@@ -28,6 +31,7 @@ def init_app():
     APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
     APP.config['RATELIMIT_STORAGE_URL'] = os.getenv('LIMIT_STORE')
+    LIMITER.init_app(APP)
 
     APP.config['CAPTCHA_KEY'] = os.getenv('SITE_KEY')
 

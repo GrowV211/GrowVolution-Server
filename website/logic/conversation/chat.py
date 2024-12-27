@@ -21,7 +21,7 @@ def get_chat_html(chat, receiver):
     user = active_user()
 
     key = ChatKey.query.filter_by(chatID=chat.id, userID=user.id).first()
-    chat_key = key.get_chat_key(user.username, user.password[0].get_password())
+    chat_key = key.get_chat_key(user.password[0].get_password(True)) # Skipping verification, cause user = active_user()
 
     for msg in chat.messages:
         date = msg.date()
@@ -60,8 +60,8 @@ def get_chat(user, receiver):
 
         chat_key = random_password()
 
-        key1 = ChatKey(user.id, user.username, chat.id, chat_key)
-        key2 = ChatKey(receiver.id, receiver.username, chat.id, chat_key)
+        key1 = ChatKey(chat.id, user, chat_key)
+        key2 = ChatKey(chat.id, receiver, chat_key)
 
         add_model(key1)
         add_model(key2)
