@@ -4,15 +4,17 @@
     <script src="{{ url_for('static', filename='js/redirect.js') }}"></script>
 {% endblock %}
 {% block content %}
-    <div class="container align-items-center text-justify not-found mt-5">
-        <h1 class="mb-3">404 - Seite nicht gefunden</h1>
-        <p>
-            Hey mein Lieber, es ist schön dich hier zu sehen!
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="main-container">
+            <h1>404 - Seite nicht gefunden</h1>
+            <p>
+                Hey mein Lieber, es ist schön dich hier zu sehen!
             Leider konnten wir für diese Adresse keine passende Seite finden...
             Vielleicht ist sie abgelaufen, wurde verschoben oder existiert gar nicht.<br><br>
 
             Wie dem auch sei, um dir das Leben einfacher zu machen, werden wir dich
             in <span id="time">6</span> Sekunden automatisch auf unsere Homepage weiterleiten.
-        </p>
+            </p>
+        </div>
     </div>
 {% endblock %}

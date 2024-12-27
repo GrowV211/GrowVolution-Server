@@ -1,4 +1,4 @@
-from website.data import Message, User, add_model, Session
+from website.data import Message, ChatKey, User, add_model, Session
 from website.logic.auth.verify import active_user
 from .chat import get_chat, render_message
 from markupsafe import Markup
@@ -13,7 +13,11 @@ def handle_request(data, socket):
 
     chat = get_chat(sender, receiver)
     content = data['content']
-    message = Message(sender.id, content, chat.id)
+
+    chat_key = ChatKey.query.filter_by(chatID=chat.id, userID=sender.id).first()
+    key = chat_key.get_chat_key(sender.username, sender.password[0].get_password())
+
+    message = Message(sender.id, content, chat.id, key)
     add_model(message)
 
     chatroom = Session.query.filter(
@@ -24,7 +28,7 @@ def handle_request(data, socket):
 
     if chatroom:
         from ..socket.manage import send_message
-        send_message('update_chat', Markup(render_message('received', message)), chatroom.socketID)
+        send_message('update_chat', Markup(render_message('received', message, key)), chatroom.socketID)
         message.set_read()
         updated = True
 
@@ -37,4 +41,4 @@ def handle_request(data, socket):
             'chat_user': sender.username
         })
 
-    return Markup(render_message('sent', message))
+    return Markup(render_message('sent', message, key))

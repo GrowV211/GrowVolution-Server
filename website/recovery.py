@@ -2,12 +2,15 @@ from tkinter import Tk
 from tkinter.simpledialog import askstring
 from tkinter.messagebox import askyesno, showinfo
 from sqlalchemy import text
-from . import APP
 from .data import DB, RecoveryAuth, Password, add_model
 from .crypt import KEY_FOLDER, encrypt_bytes, decrypt_bytes
 from .temporary import SESSION_PSW
 from .logic.updating.user import update_passwords
 from .debugger import log
+
+#   Please recognize:
+#   This logic is temporary, password restoring won't be
+#   done via one device and not at the server environment.
 
 ROOT = Tk()
 ROOT.withdraw()

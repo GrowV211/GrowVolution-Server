@@ -57,6 +57,22 @@ footer address {
     }
 }
 
+.main-container {
+    text-align: center;
+    width: 100%;
+    max-width: 650px;
+}
+
+.main-container h1 {
+    font-size: 2rem;
+    color: #333;
+}
+
+.main-container p {
+    font-size: 1.2rem;
+    color: #555;
+}
+
 input {
     border: 2px solid #808080 !important;
     border-radius: 5px !important;
@@ -108,11 +124,6 @@ input:disabled {
 .btn:hover {
     font-size: 17px !important;
     box-shadow: 0 0 5px 2px darkgray !important;
-}
-
-.not-found {
-    max-width: 500px;
-    width: 100%;
 }
 
 .progress-bar {

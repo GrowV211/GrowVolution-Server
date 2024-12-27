@@ -19,6 +19,7 @@ def get_chat_html(chat, receiver):
     current_date = None
 
     user = active_user()
+
     key = ChatKey.query.filter_by(chatID=chat.id, userID=user.id).first()
     chat_key = key.get_chat_key(user.username, user.password[0].get_password())
 
