@@ -11,12 +11,12 @@
                 timer.textContent = time.toString()
                 if (time <= 0) {
                     clearInterval(interval)
-                    window.location = "{{ homepage }}login"
+                    window.location = "https://growvolution.org/login"
                 }
             }, 1000)
 
             document.getElementById("login").addEventListener("click", () => {
-                window.location = "{{ homepage }}login"
+                window.location = "https://growvolution.org/login"
             })
         })
     </script>

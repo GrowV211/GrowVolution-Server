@@ -1,12 +1,13 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
+import threading
 
 PROJECT_PATH = Path(__file__).resolve().parent
 
 
 def _restart_condition(event):
-    if event.src_path.endswith(".py") or event.src_path.endswith(".html") or event.src_path.endswith(".env"):
+    if event.src_path.endswith(".py") or event.src_path.endswith(".html") or event.src_path.endswith(".env") and not (event.src_path.endswith("watcher.py") or event.src_path.endswith("run.py")):
         return True
     return False
 
@@ -51,5 +52,3 @@ def start_watching(starter):
     event_handler.start_gunicorn()
 
     return [observer, event_handler]
-
-

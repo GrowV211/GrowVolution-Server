@@ -1,19 +1,31 @@
 from dotenv import load_dotenv
 from pathlib import Path
 from watcher import start_watching
+from datetime import datetime
 import subprocess
+import threading
+import time
 import os
 
 FILE_PATH = Path(__file__).resolve().parent
-GUNICORN_CMD = ['gunicorn', '-b', '127.0.0.1:5000', '-k', 'eventlet', 'app:app']
+LOG_PATH = FILE_PATH / 'website' / 'logs'
+SESSION_LOG = ''
+
+GUNICORN_CMD = ['env', 'PYTHONUNBUFFERED=1', 'gunicorn', '-b', '127.0.0.1:5000', '-k', 'eventlet', 'app:app']
 DUMMY_CMD = ['gunicorn', '-b', '127.0.0.1:5000', 'dummy:app']
 PROCESS = None
+LOGGER = None
 
 EXEC_MODE = ''
 
+EXIT = False
+
+os.makedirs(LOG_PATH, exist_ok=True)
+
 
 def start_server():
-    return subprocess.Popen(GUNICORN_CMD)
+    return subprocess.Popen(GUNICORN_CMD, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, bufsize=1)
 
 
 def _start_dummy():
@@ -48,6 +60,8 @@ def clear_logs():
 
 
 def console():
+    global LOGGER
+
     info = ("You can enter the following commands:"
           "\n\n\t1. start - to start the main server"
           "\n\t2. stop - to stop the main server"
@@ -62,6 +76,9 @@ def console():
           f"Start script running.\n")
 
     dummy = start_dummy()
+
+    LOGGER = threading.Thread(target=_logger)
+    LOGGER.start()
 
     print(info)
 
@@ -95,8 +112,11 @@ def console():
             stop_dummy(dummy)
 
         elif cmd == 'exit':
+            global EXIT
+            EXIT = True
             stop()
             stop_dummy(dummy)
+            LOGGER.join()
             print("Thank you for playing the game of life, bye!")
             break
 
@@ -139,16 +159,40 @@ def _stop():
     print("Server stopped.\n")
 
 
+def _logger():
+    debug = is_debug()
+
+    print("Executing logger thread...\n")
+
+    while not EXIT:
+        process = PROCESS[1].process if PROCESS and debug else PROCESS
+
+        if process:
+            print(f"Starting logger for {SESSION_LOG}...")
+            with open(LOG_PATH / SESSION_LOG, 'w') as log:
+                for line in process.stdout:
+                    if not line.startswith("[FLASK]"):
+                        line = f"[GUNICORN] {line}"
+
+                    if debug:
+                        print(line, end='')
+
+                    log.write(line)
+
+            print(f"Logger for {SESSION_LOG} stopped.\n")
+            time.sleep(3)
+
+        time.sleep(1)
+
+    print("Logger thread stopped.\n")
+
+
 def main():
-    global PROCESS
+    global SESSION_LOG, PROCESS
+    SESSION_LOG = f'SESSION-{datetime.now().strftime("%Y%m%d%H%M%S")}.log'
 
-    if is_debug():
-        print("Starting server in debug mode...\n")
-        PROCESS = start_watching(start_server)
-
-    else:
-        print("Starting server in production mode...\n")
-        PROCESS = start_server()
+    print(f"Starting server in {EXEC_MODE} mode...")
+    PROCESS = start_watching(start_server) if is_debug() else start_server()
 
 
 if __name__ == '__main__':

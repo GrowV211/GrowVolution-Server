@@ -1,6 +1,6 @@
 from flask import make_response, redirect, request, session, flash
 from ... import APP
-from ...temporary import _calc_seconds, ONE_HOUR, session_lifecycle
+from ...temporary import _calc_seconds, ONE_HOUR
 from ...data import Session, add_model
 from .verify import session_data
 from uuid import uuid4
@@ -63,30 +63,30 @@ def _verify_new_session(user_agent):
 
 
 def _verify_active_session(data, sess):
-    if data and data['session_ip'] != request.remote_addr or data['user_agent'] != request.headers.get('User-Agent'):
-        sess.set_invalid()
-        return _refuse_request("IP address mismatch!")
+    from ...debugger import log
 
-    elif not sess.valid:
-        return _refuse_request("Session invalid!")
+    if data and data['session_ip'] != request.remote_addr or data['user_agent'] != request.headers.get('User-Agent'):
+        log('warn', "Mismatching requestor identification attributes!")
+        sess.set_invalid()
+        return _refuse_request("Requestor identification failed!")
 
     elif request.method == "POST":
         if not request.form.get('csrf') == sess.csrf_token:
+            log('warn', "CSRF token mismatch!")
 
             if not session.get('invalid_csrf'):
                 session['invalid_csrf'] = 1
             else:
                 session['invalid_csrf'] += 1
 
-            return _refuse_request("CSRF token mismatch!")
+            flash("Dein CSRF Token ist ungültig!", "danger")
+            return redirect(request.path)
 
     elif session.get('invalid_csrf') and session['invalid_csrf'] > 3:
+        log('warn', "Too many invalid CSRF checks - session blocked!")
         sess.set_invalid()
+        session.clear()
         return _refuse_request("Session blocked due to too many invalid CSRF checks!")
-
-    elif session.get('dynamic_requests') and session['dynamic_requests'] >= 2 and not sess.verified:
-        sess.set_invalid()
-        return _refuse_request("Session has not been verified and will be blocked!")
 
     return None
 
@@ -106,27 +106,35 @@ def _track_activity(path):
 
 
 def _check_activity(sess):
+    from ...debugger import log
     dynamic = session.get('dynamic_requests')
     static = session.get('static_requests')
 
-    if dynamic and static:
+    if dynamic and dynamic > 5 and not static:
+        log('warn',
+            f"Suspicious activity - missing static requests from {request.remote_addr}!")
+        sess.set_invalid()
+        session.clear()
+        return _refuse_request("Session blocked due to suspicious activity!")
 
-        if dynamic > 1 and static < 2:
-            from ...debugger import log
-            flash("Verdächtige Aktivitäten festgestellt!", 'danger')
-            log('warn', "Suspicious activity detected!")
-
-        elif dynamic > 10 and static < 15:
-            sess.set_invalid()
-            return _refuse_request("Session blocked due to suspicious activity!")
+    elif dynamic and dynamic > 5 and not sess.verified:
+        log('warn', "Suspicious activity - unverified session!")
+        sess.set_invalid()
+        session.clear()
+        return _refuse_request("Session has not been verified and will be blocked!")
 
     return None
 
 
 def handle_session(path):
     data = session_data()
+    sess = Session.query.filter_by(id=data['session_id']).first() if data else None
 
-    if not data:
+    if sess and not sess.valid:
+        return _refuse_request("Session invalid!")
+
+    if not data or not sess:
+        session.clear()
         user_agent = request.headers.get('User-Agent')
 
         new_session_invalid = _verify_new_session(user_agent)
@@ -135,15 +143,12 @@ def handle_session(path):
 
         sess = Session(uuid4())
         add_model(sess)
-        session_lifecycle(sess.id)
 
         return token_response({
             'session_id': sess.id,
             'session_ip': request.remote_addr,
             'user_agent': user_agent
         }, path)
-
-    sess = Session.query.filter_by(id=data['session_id']).first()
 
     session_invalid = _verify_active_session(data, sess)
     if session_invalid:

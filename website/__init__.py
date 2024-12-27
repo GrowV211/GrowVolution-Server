@@ -27,6 +27,8 @@ def init_app():
     APP.config['SERVER_NAME'] = os.getenv('SERVER_NAME')
     APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
+    APP.config['RATELIMIT_STORAGE_URL'] = os.getenv('LIMIT_STORE')
+
     APP.config['CAPTCHA_KEY'] = os.getenv('SITE_KEY')
 
     from .views import views

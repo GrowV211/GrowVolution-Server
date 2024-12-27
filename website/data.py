@@ -93,7 +93,10 @@ class User(DB.Model):
     last = DB.Column(DB.String(30), nullable=False)
     username = DB.Column(DB.String(35), nullable=False, unique=True)
     email = DB.Column(DB.String(60), nullable=False, unique=True)
+
     psw_crypt = DB.Column(DB.String(256), nullable=False)
+    has_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
+    update_async_keys = DB.Column(DB.Boolean, nullable=False, default=False)
 
     info = DB.Column(DB.String(500), nullable=True)
     img = DB.Column(DB.String(39), nullable=True)
@@ -186,6 +189,18 @@ class User(DB.Model):
 
     def check_psw(self, password):
         return CRYPT.check_password_hash(self.psw_crypt, password)
+
+    def keypair_generated(self):
+        self.has_async_keys = True
+        commit()
+
+    def update_keypair(self):
+        self.update_async_keys = True
+        commit()
+
+    def set_keypair_updated(self):
+        self.update_async_keys = False
+        commit()
 
     def add_relator(self, relator):
         if not relator in self.relators:
@@ -322,12 +337,12 @@ class Chat(DB.Model):
         if self.messages:
             last = self.messages[-1]
             by_user = 'ich' if last.sender == user else last.sender.first
-            last_content = last.get_content(user.username, user.psw)
+            last_content = last.get_content(user.username, user.password.get_password())
 
             if len(last.content) > 25:
-                last = last.content[:25] + '...'
+                last = last_content[:25] + '...'
             else:
-                last = last.content
+                last = last_content
         else:
             last = None
             by_user = None
@@ -360,13 +375,13 @@ class Message(DB.Model):
     chat = DB.relationship('Chat', foreign_keys=[chatID], back_populates='messages')
     sender = DB.relationship('User', foreign_keys=[senderID], back_populates='sent')
 
-    def __init__(self, sender, content, chat):
+    def __init__(self, sender, content, chat, key):
         self.senderID = sender
-        self.enc_content = async_encrypt(content, f"chat_{str(chat)}")
+        self.enc_content = encrypt_bytes(content, key)
         self.chatID = chat
 
-    def get_content(self, requestor, psw):
-        content = async_decrypt(self.enc_content, psw, f"{requestor}_chat_{str(self.chatID)}")
+    def get_content(self, key):
+        content = decrypt_bytes(self.enc_content, key, True)
         return whitespace_chars_html(content)
 
     def set_read(self):
@@ -804,7 +819,7 @@ class Session(DB.Model):
 
     valid = DB.Column(DB.Boolean, nullable=False, default=True)
     verified = DB.Column(DB.Boolean, nullable=False, default=False)
-    csrf_token = DB.Column(DB.String(32))
+    csrf_token = DB.Column(DB.String(64))
 
     timestamp = DB.Column(DB.TIMESTAMP, server_default=DB.func.current_timestamp(), nullable=False)
 
@@ -850,34 +865,32 @@ class Password(DB.Model):
     id = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
     userID = DB.Column(DB.Integer, DB.ForeignKey('account.id'), nullable=False)
     enc_psw= DB.Column(DB.LargeBinary, nullable=False)
-    storage_mode = DB.Column(DB.String(8), nullable=False)
 
     user = DB.relationship('User', foreign_keys=[userID], back_populates='password')
 
     def __init__(self, user):
         self.userID = user
-        self.storage_mode = 'TMP'
-
-    def update_storage_mode(self, mode):
-        psw = self.get_password()
-        self.storage_mode = mode
-        self.safe_password(psw)
-        commit()
 
     def safe_password(self, psw):
-        from .temporary import TMP_PASSWORD, RECOVERY_PSW
-
-        if self.storage_mode == 'TMP':
-            self.enc_psw = encrypt_bytes(psw, TMP_PASSWORD)
-        else:
-            self.enc_psw = encrypt_bytes(psw, RECOVERY_PSW)
-
+        from .temporary import SESSION_PSW
+        self.enc_psw = encrypt_bytes(psw, SESSION_PSW)
         commit()
 
     def get_password(self):
-        from .temporary import TMP_PASSWORD, RECOVERY_PSW
+        from .temporary import SESSION_PSW
+        return decrypt_bytes(self.enc_psw, SESSION_PSW, True)
 
-        if self.storage_mode == 'TMP':
-            return decrypt_bytes(self.enc_psw, TMP_PASSWORD, True)
-        else:
-            return decrypt_bytes(self.enc_psw, RECOVERY_PSW, True)
+
+class ChatKey(DB.Model):
+    __tablename__ = 'ChatKey'
+    userID = DB.Column(DB.Integer, primary_key=True, nullable=False)
+    chatID = DB.Column(DB.Integer, primary_key=True, nullable=False)
+    enc_chat_key = DB.Column(DB.LargeBinary, nullable=False)
+
+    def __init__(self, user_id, username, chat, chat_key):
+        self.userID = user_id
+        self.chatID = chat
+        self.enc_chat_key = async_encrypt(chat_key, username)
+
+    def get_chat_key(self, username, password):
+        return async_decrypt(self.enc_chat_key, password, username).decode('utf-8')

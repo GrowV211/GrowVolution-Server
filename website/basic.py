@@ -31,7 +31,7 @@ def render_404():
 
 
 def render_error():
-    return render('error.html'), 500
+    return render_template('error.html'), 500
 
 
 def render_with_flash(template, message, category, **kwargs):

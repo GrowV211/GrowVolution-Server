@@ -23,9 +23,10 @@ def captcha_check():
     response = requests.post(verification_url, data=data)
     result = response.json()
 
-    if not result.get("success") or result.get("score", 0) < 0.66:
+    if not result.get("success") or result.get("score", 0) < 0.5:
         log('warn', "Failed captcha check!")
-        return "Du wurdest von reCAPTCHA als unvertrauenswürdig eingestuft!"
+        log('danger', "Captcha protection disabled!")
+        #return "Du wurdest von reCAPTCHA als unvertrauenswürdig eingestuft!"
 
     return None
 

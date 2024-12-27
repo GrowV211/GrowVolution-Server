@@ -6,6 +6,15 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from os import urandom
 from pathlib import Path
+import secrets
+import string
+
+KEY_FOLDER = Path(__file__).resolve().parent / 'keys'
+CHARSET = string.ascii_letters + string.digits + string.punctuation
+
+
+def random_password(length: int = 32):
+    return ''.join(secrets.choice(CHARSET) for _ in range(length))
 
 
 def _derive_key(password: str, salt: bytes) -> bytes:
@@ -32,22 +41,20 @@ def decrypt_bytes(data: bytes, password: str, return_as_str: bool = False) -> by
     return decrypted_data.decode() if return_as_str else decrypted_data
 
 
-def create_async_keypair(privkey_map: dict, pubkey_name: str):
-    key_folder = Path(__file__).resolve().parent / 'keys'
+def create_async_keypair(password: str, filename: str):
 
     private_key = rsa.generate_private_key(
         public_exponent=65537, key_size=2048, backend=default_backend())
     public_key = private_key.public_key()
 
-    for filename, password in privkey_map.items():
-        with open(key_folder / "private" / f"{filename}.pem", "wb") as private_file:
-            private_file.write(private_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
-                encryption_algorithm=serialization.BestAvailableEncryption(password.encode())
-            ))
+    with open(KEY_FOLDER / "private" / f"{filename}.pem", "wb") as private_file:
+        private_file.write(private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.BestAvailableEncryption(password.encode())
+        ))
 
-    with open(key_folder / "public" / f"{pubkey_name}.pem", "wb") as public_file:
+    with open(KEY_FOLDER / "public" / f"{filename}.pem", "wb") as public_file:
         public_file.write(public_key.public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -55,9 +62,8 @@ def create_async_keypair(privkey_map: dict, pubkey_name: str):
 
 
 def async_encrypt(data: bytes | str, filename: str) -> bytes:
-    key_folder = Path(__file__).resolve().parent / 'keys'
 
-    with open(key_folder / "public" / f"{filename}.pem", "rb") as public_file:
+    with open(KEY_FOLDER / "public" / f"{filename}.pem", "rb") as public_file:
         public_key = serialization.load_pem_public_key(public_file.read(), backend=default_backend())
 
     if isinstance(data, str):
@@ -68,9 +74,8 @@ def async_encrypt(data: bytes | str, filename: str) -> bytes:
 
 
 def async_decrypt(data: bytes, password: str, filename: str) -> bytes | str:
-    key_folder = Path(__file__).resolve().parent / 'keys'
 
-    with open(key_folder / "private" / f"{filename}.pem", "rb") as private_file:
+    with open(KEY_FOLDER / "private" / f"{filename}.pem", "rb") as private_file:
         private_key = serialization.load_pem_private_key(private_file.read(),
                                                          password=password.encode(),
                                                          backend=default_backend())
@@ -79,3 +84,12 @@ def async_decrypt(data: bytes, password: str, filename: str) -> bytes | str:
         mgf=padding.MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None))
 
     return decrypted_data
+
+
+def delete_keypair(filename: str):
+    public = KEY_FOLDER / "public" / f"{filename}.pem"
+    private = KEY_FOLDER / "private" / f"{filename}.pem"
+    if public.exists():
+        public.unlink()
+    if private.exists():
+        private.unlink()
