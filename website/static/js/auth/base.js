@@ -43,20 +43,6 @@ function init() {
         help.addEventListener("click", () => {
             forgotQuery({ value: 'forgot' })
         })
-
-        document.getElementById('login').addEventListener("click", (e) => {
-            const username = document.getElementById('user').value
-            const password = document.getElementById('pass').value
-            sessionStorage.setItem('username', username)
-            sessionStorage.setItem('password', password)
-
-            const sid = document.createElement('input')
-            sid.type = 'hidden'
-            sid.name = 'sid'
-            sid.value = SOCKET.id
-
-            form.appendChild(sid)
-        })
     }
 
     if (captchaScript) {

@@ -38,6 +38,9 @@ class ChangeHandler(FileSystemEventHandler):
 
     def stop_gunicorn(self):
         if self.process:
+            self.process.stdin.write("recover")
+            self.process.stdin.flush()
+
             self.process.terminate()
             self.process.wait()
 

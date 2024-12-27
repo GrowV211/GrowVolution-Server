@@ -13,8 +13,8 @@ KEY_FOLDER = Path(__file__).resolve().parent / 'keys'
 CHARSET = string.ascii_letters + string.digits + string.punctuation
 
 
-def random_password(length: int = 32):
-    return ''.join(secrets.choice(CHARSET) for _ in range(length))
+def random_password(length: int = 32) -> str:
+    return (''.join(secrets.choice(CHARSET) for _ in range(length)))
 
 
 def _derive_key(password: str, salt: bytes) -> bytes:
@@ -67,7 +67,7 @@ def async_encrypt(data: bytes | str, filename: str) -> bytes:
         public_key = serialization.load_pem_public_key(public_file.read(), backend=default_backend())
 
     if isinstance(data, str):
-        data = data.encode()
+        data = data.encode('utf-8')
 
     return public_key.encrypt(data, padding.OAEP(
         mgf=padding.MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None))

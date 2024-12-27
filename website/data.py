@@ -894,3 +894,15 @@ class ChatKey(DB.Model):
 
     def get_chat_key(self, username, password):
         return async_decrypt(self.enc_chat_key, password, username).decode('utf-8')
+
+
+class RecoveryAuth(DB.Model):
+    __tablename__ = 'SessionRecovery'
+    id = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
+    password_crypt = DB.Column(DB.String(256), nullable=False)
+
+    def __init__(self, password):
+        self.password_crypt = CRYPT.generate_password_hash(password).decode()
+
+    def check_psw(self, password):
+        return CRYPT.check_password_hash(self.password_crypt, password)

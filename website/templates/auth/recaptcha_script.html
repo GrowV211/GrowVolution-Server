@@ -1,16 +1,20 @@
 <script id="recaptcha">
     form = document.getElementById("auth")
+    form.captchaExecuted = false
     form.addEventListener("submit", (e) => {
         e.preventDefault()
 
-        grecaptcha.execute('{{ site_key }}', { action: 'submit' }).then(function (token) {
-            const recaptchaInput = document.createElement('input');
-            recaptchaInput.type = 'hidden';
-            recaptchaInput.name = 'g-recaptcha-response';
-            recaptchaInput.value = token;
+        if (!form.captchaExecuted) {
+            grecaptcha.execute('{{ site_key }}', {action: 'submit'}).then(function (token) {
+                const recaptchaInput = document.createElement('input');
+                recaptchaInput.type = 'hidden';
+                recaptchaInput.name = 'g-recaptcha-response';
+                recaptchaInput.value = token;
 
-            form.appendChild(recaptchaInput);
-            form.submit();
-        });
+                form.appendChild(recaptchaInput);
+                form.submit();
+            });
+            form.captchaExecuted = true
+        }
     })
 </script>

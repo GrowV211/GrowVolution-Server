@@ -24,7 +24,7 @@ os.makedirs(LOG_PATH, exist_ok=True)
 
 
 def start_server():
-    return subprocess.Popen(GUNICORN_CMD, stdout=subprocess.PIPE,
+    return subprocess.Popen(GUNICORN_CMD, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
                             stderr=subprocess.STDOUT, text=True, bufsize=1)
 
 
@@ -144,6 +144,7 @@ def _stop():
 
     print("Shutting down server session...")
 
+
     if is_debug():
         PROCESS[1].stop_gunicorn()
 
@@ -152,6 +153,9 @@ def _stop():
         PROCESS[0].join()
 
     else:
+        PROCESS.stdin.write('recover')
+        PROCESS.stdin.flush()
+
         PROCESS.terminate()
         PROCESS.wait()
 

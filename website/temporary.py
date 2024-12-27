@@ -3,7 +3,7 @@ import threading
 import random
 from . import APP
 from .debugger import log
-from .crypt import random_password
+from .crypt import random_password, decrypt_bytes
 from .logic.updating import user, session
 from datetime import datetime, timedelta
 
@@ -128,6 +128,10 @@ def _update_passwords():
     with APP.app_context():
         user.update_passwords(old_psw)
 
+    from .recovery import set_recovery_crypt, RECOVERY_CRYPT, safe_session_password
+    set_recovery_crypt(decrypt_bytes(RECOVERY_CRYPT, old_psw, True))
+    safe_session_password()
+
 
 def _updater():
     timer = _remaining_seconds()
@@ -137,6 +141,11 @@ def _updater():
     log('info', f"Database updater started, next update in {timer} seconds.")
 
     _update_session_psw()
+
+    from .recovery import check_existing_config, start_recovery
+    with APP.app_context():
+        if check_existing_config():
+            start_recovery()
 
     while True:
         time.sleep(half_hour)
@@ -148,6 +157,7 @@ def _updater():
             _update_users(date)
             timer = _calc_seconds(ONE_DAY)
             date += timedelta(days=1)
+
 
 def start_updater():
     threading.Thread(target=_updater).start()
